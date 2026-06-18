@@ -31,6 +31,13 @@
             padding: 2rem 1rem;
             box-shadow: 2px 0 10px rgba(0,0,0,0.3);
             backdrop-filter: blur(5px);
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            margin-left: -250px;
+            box-shadow: none;
         }
 
         .logo {
@@ -105,6 +112,33 @@
             justify-content: center;
             align-items: center;
             padding: 2rem;
+            position: relative;
+        }
+
+        /* 收放側邊欄按鈕 */
+        .toggle-sidebar-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(36, 59, 85, 0.9);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .toggle-sidebar-btn:hover {
+            background: var(--primary-blue);
+            color: var(--accent-gold);
+            border-color: var(--accent-gold);
         }
 
         .content-card {
@@ -186,6 +220,9 @@
 
     <!-- 主要內容區 -->
     <div class="main-content">
+        <!-- 收放側邊欄按鈕 -->
+        <button class="toggle-sidebar-btn" onclick="toggleSidebar()">✕</button>
+
         <div class="content-card" id="display-area">
             <div id="welcome-msg">
                 <span class="crystal-icon">✨</span>
@@ -203,6 +240,18 @@
                     <input type="range" id="bracelet-size" min="12" max="16" step="0.5" value="14">
                 </div>
 
+                <!-- 礦石大小選擇 -->
+                <div class="select-group">
+                    <label for="bead-size">礦石大小:</label>
+                    <select id="bead-size">
+                        <option value="4">4mm</option>
+                        <option value="6" selected>6mm (預設)</option>
+                        <option value="8">8mm</option>
+                        <option value="10">10mm</option>
+                        <option value="12">12mm</option>
+                    </select>
+                </div>
+
                 <!-- 水晶選擇 -->
                 <div class="bead-picker">
                     <div class="bead-option" onclick="addBead('amethyst')" title="紫水晶">
@@ -217,6 +266,14 @@
                         <div class="bead-preview aquamarine"></div>
                         <span>海藍寶</span>
                     </div>
+                    <div class="bead-option" onclick="addBead('tourmaline')" title="彩碧璽">
+                        <div class="bead-preview tourmaline"></div>
+                        <span>彩碧璽</span>
+                    </div>
+                    <div class="bead-option" onclick="addBead('garnet')" title="石榴石">
+                        <div class="bead-preview garnet"></div>
+                        <span>石榴石</span>
+                    </div>
                 </div>
 
                 <!-- 手鍊畫布 -->
@@ -230,8 +287,9 @@
                 </div>
 
                 <div class="actions">
+                    <button class="btn-distribute" onclick="distributeEvenly()">均勻排列</button>
                     <button class="btn-clear" onclick="clearBeads()">重置</button>
-                    <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">提示：點擊上方水晶即可加入手鍊</p>
+                    <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">提示：點擊上方水晶即可加入手鍊；按住水晶可拖曳調整位置</p>
                 </div>
             </div>
         </div>
@@ -264,6 +322,8 @@
         .amethyst { background: radial-gradient(circle at 30% 30%, #a29bfe, #6c5ce7); }
         .citrine { background: radial-gradient(circle at 30% 30%, #ffeaa7, #fdcb6e); }
         .aquamarine { background: radial-gradient(circle at 30% 30%, #81ecec, #00cec9); }
+        .tourmaline { background: linear-gradient(135deg, #ff7675, #ffeaa7, #55efc4, #a29bfe); }
+        .garnet { background: radial-gradient(circle at 30% 30%, #ff7675, #8b0000); }
 
         .canvas-container {
             background: rgba(255, 255, 255, 0.5);
@@ -272,7 +332,44 @@
             margin: 20px 0;
         }
 
+        /* 礦石大小選擇器樣式 */
+        .select-group {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .select-group label {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+        .select-group select {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            background-white: white;
+            cursor: pointer;
+            accent-color: var(--primary-blue);
+        }
+
         #bracelet-svg { width: 100%; max-width: 300px; height: auto; }
+
+        .btn-distribute {
+            background: var(--primary-blue);
+            color: white;
+            border: 1px solid var(--accent-gold);
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-right: 10px;
+        }
+        .btn-distribute:hover { 
+            background: var(--hover-blue);
+            color: var(--accent-gold);
+        }
 
         .btn-clear {
             background: #e74c3c;
@@ -295,19 +392,87 @@
         }
 
         let selectedBeads = [];
+        let draggedBeadIndex = null;
         const sizeInput = document.getElementById('bracelet-size');
         const sizeVal = document.getElementById('size-val');
+        const beadSizeInput = document.getElementById('bead-size');
         const beadsGroup = document.getElementById('beads-group');
         const baseCircle = document.getElementById('base-circle');
+        const braceletSvg = document.getElementById('bracelet-svg');
 
         sizeInput.addEventListener('input', () => {
             sizeVal.innerText = sizeInput.value;
             updateBracelet();
         });
 
+        // 當選擇大小改變時，不自動更新舊的珠子，只影響之後新增的
+        beadSizeInput.addEventListener('change', () => {
+            // updateBracelet(); // 移除此行以保留個別珠子大小
+        });
+
+        function getNextBeadAngle() {
+            if (selectedBeads.length === 0) {
+                return 0; // 第一顆放在 0 度 (右側)
+            }
+            if (selectedBeads.length === 1) {
+                // 第二顆放在對向 (180度)
+                return (selectedBeads[0].angle + Math.PI) % (2 * Math.PI);
+            }
+
+            // 取得所有珠子的角度並正規化到 [0, 2*Math.PI)
+            const angles = selectedBeads.map(b => {
+                let a = b.angle % (2 * Math.PI);
+                if (a < 0) a += 2 * Math.PI;
+                return a;
+            });
+
+            // 排序
+            angles.sort((a, b) => a - b);
+
+            // 尋找最大空隙
+            let maxGap = 0;
+            let insertAngle = 0;
+
+            for (let i = 0; i < angles.length; i++) {
+                const current = angles[i];
+                const next = angles[(i + 1) % angles.length];
+                
+                let gap;
+                if (next > current) {
+                    gap = next - current;
+                } else {
+                    // 跨越 0 度的最後一個間隙
+                    gap = (next + 2 * Math.PI) - current;
+                }
+
+                if (gap > maxGap) {
+                    maxGap = gap;
+                    insertAngle = (current + gap / 2) % (2 * Math.PI);
+                }
+            }
+
+            return insertAngle;
+        }
+
         function addBead(type) {
             if (selectedBeads.length >= 24) return; // 限制數量
-            selectedBeads.push(type);
+            const currentSize = parseFloat(beadSizeInput.value) || 6;
+            
+            // 計算新珠子的最佳角度，使其在最大空隙中且不影響其他已移動水晶
+            const nextAngle = getNextBeadAngle();
+            selectedBeads.push({ type: type, size: currentSize, angle: nextAngle });
+            updateBracelet();
+        }
+
+        function redistributeBeads() {
+            const count = selectedBeads.length;
+            selectedBeads.forEach((bead, index) => {
+                bead.angle = (index / count) * 2 * Math.PI;
+            });
+        }
+
+        function distributeEvenly() {
+            redistributeBeads();
             updateBracelet();
         }
 
@@ -323,42 +488,105 @@
             baseCircle.setAttribute('r', radius);
 
             beadsGroup.innerHTML = '';
-            const count = selectedBeads.length;
-            
-            selectedBeads.forEach((type, index) => {
-                const angle = (index / count) * 2 * Math.PI;
+
+            selectedBeads.forEach((beadData, index) => {
+                const type = beadData.type;
+                const beadSize = beadData.size;
+                const beadRadius = beadSize * (8 / 6); // 基礎 6mm 對應 8px 半徑
+                const angle = beadData.angle;
+
                 const x = 150 + radius * Math.cos(angle);
                 const y = 150 + radius * Math.sin(angle);
 
                 const bead = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 bead.setAttribute("cx", x);
                 bead.setAttribute("cy", y);
-                bead.setAttribute("r", 8); // 珠子大小
-                
-                // 設定漸層顏色
-                let fill = "";
-                if (type === 'amethyst') fill = "url(#grad-purple)";
-                if (type === 'citrine') fill = "url(#grad-yellow)";
-                if (type === 'aquamarine') fill = "url(#grad-blue)";
+                bead.setAttribute("r", beadRadius); 
+                bead.setAttribute("class", "draggable-bead");
+                bead.setAttribute("data-index", index);
                 
                 bead.setAttribute("fill", getBeadColor(type));
-                bead.setAttribute("stroke", "rgba(255,255,255,0.3)");
-                bead.setAttribute("stroke-width", "1");
+                bead.setAttribute("stroke", draggedBeadIndex === index ? "#d4af37" : "rgba(255,255,255,0.3)");
+                bead.setAttribute("stroke-width", draggedBeadIndex === index ? "2" : "1");
                 
-                // 加入陰影效果
                 bead.style.filter = "drop-shadow(2px 2px 2px rgba(0,0,0,0.3))";
+                bead.style.cursor = "grab";
                 
+                // 滑鼠拖拽事件
+                bead.addEventListener('mousedown', (e) => {
+                    draggedBeadIndex = index;
+                    bead.style.cursor = "grabbing";
+                    e.stopPropagation();
+                });
+
                 beadsGroup.appendChild(bead);
             });
         }
+
+        // SVG 全局滑鼠事件處理拖拽
+        braceletSvg.addEventListener('mousemove', (e) => {
+            if (draggedBeadIndex === null) return;
+
+            // 取得 SVG 的座標系並轉換至 SVG 的 viewBox 比例 (0 到 300)
+            const rect = braceletSvg.getBoundingClientRect();
+            const svgX = (e.clientX - rect.left) * (300 / rect.width);
+            const svgY = (e.clientY - rect.top) * (300 / rect.height);
+            
+            // 計算相對於中心點 (150, 150) 的偏移量
+            const dx = svgX - 150;
+            const dy = svgY - 150;
+
+            // 計算弧度角度
+            let angle = Math.atan2(dy, dx);
+            if (angle < 0) angle += 2 * Math.PI;
+
+            // 更新被拖拽珠子的角度
+            selectedBeads[draggedBeadIndex].angle = angle;
+            updateBracelet();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (draggedBeadIndex !== null) {
+                draggedBeadIndex = null;
+                updateBracelet();
+            }
+        });
+
+        // 支援觸控裝置
+        braceletSvg.addEventListener('touchmove', (e) => {
+            if (draggedBeadIndex === null) return;
+            const touch = e.touches[0];
+            const rect = braceletSvg.getBoundingClientRect();
+            const svgX = (touch.clientX - rect.left) * (300 / rect.width);
+            const svgY = (touch.clientY - rect.top) * (300 / rect.height);
+            
+            const dx = svgX - 150;
+            const dy = svgY - 150;
+
+            let angle = Math.atan2(dy, dx);
+            if (angle < 0) angle += 2 * Math.PI;
+
+            selectedBeads[draggedBeadIndex].angle = angle;
+            updateBracelet();
+            e.preventDefault();
+        }, { passive: false });
+
+        window.addEventListener('touchend', () => {
+            if (draggedBeadIndex !== null) {
+                draggedBeadIndex = null;
+                updateBracelet();
+            }
+        });
 
         function getBeadColor(type) {
             const colors = {
                 amethyst: "#6c5ce7",
                 citrine: "#fdcb6e",
-                aquamarine: "#00cec9"
+                aquamarine: "#00cec9",
+                tourmaline: "#ff7675",
+                garnet: "#8b0000"
             };
-            return colors[type];
+            return colors[type] || "#cccccc";
         }
 
         function toggleSubmenu(id) {
@@ -371,6 +599,19 @@
                 span.style.display = 'inline-block';
             } else {
                 span.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // 收放側邊欄功能
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+            
+            const toggleBtn = document.querySelector('.toggle-sidebar-btn');
+            if (sidebar.classList.contains('collapsed')) {
+                toggleBtn.innerHTML = '☰';
+            } else {
+                toggleBtn.innerHTML = '✕';
             }
         }
     </script>
