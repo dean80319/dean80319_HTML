@@ -160,7 +160,7 @@
                 📿 水晶礦石手作 <span>▾</span>
             </button>
             <div id="crystal-handmade" class="submenu">
-                <a href="#" class="sub-link">⚪ 串珠</a>
+                <a href="#" class="sub-link" onclick="showDesigner()">⚪ 串珠</a>
                 <a href="#" class="sub-link">🧶 編織</a>
             </div>
         </div>
@@ -180,19 +180,184 @@
 
     <!-- 主要內容區 -->
     <div class="main-content">
-        <div class="content-card">
-            <span class="crystal-icon">✨</span>
-            <h1>歡迎來到 鷗哩手作</h1>
-            <p>點擊左側的「水晶小學堂」，探索各種水晶的奧秘與能量。<br>我們致力於將大自然的禮物，轉化為陪伴您的精美手作。</p>
+        <div class="content-card" id="display-area">
+            <div id="welcome-msg">
+                <span class="crystal-icon">✨</span>
+                <h1>歡迎來到 鷗哩手作</h1>
+                <p>點擊左側的「水晶小學堂」，探索各種水晶的奧秘與能量。<br>我們致力於將大自然的禮物，轉化為陪伴您的精美手作。</p>
+            </div>
+
+            <!-- 手鍊搭配軟體區 (預設隱藏) -->
+            <div id="bracelet-designer" style="display: none;">
+                <h2 style="color: var(--primary-blue);">✨ 專屬手鍊設計師</h2>
+                
+                <!-- 尺寸調整 -->
+                <div class="control-group">
+                    <label>手圍大小: <span id="size-val">14</span> 公分</label>
+                    <input type="range" id="bracelet-size" min="12" max="16" step="0.5" value="14">
+                </div>
+
+                <!-- 水晶選擇 -->
+                <div class="bead-picker">
+                    <div class="bead-option" onclick="addBead('amethyst')" title="紫水晶">
+                        <div class="bead-preview amethyst"></div>
+                        <span>紫水晶</span>
+                    </div>
+                    <div class="bead-option" onclick="addBead('citrine')" title="黃水晶">
+                        <div class="bead-preview citrine"></div>
+                        <span>黃水晶</span>
+                    </div>
+                    <div class="bead-option" onclick="addBead('aquamarine')" title="海藍寶">
+                        <div class="bead-preview aquamarine"></div>
+                        <span>海藍寶</span>
+                    </div>
+                </div>
+
+                <!-- 手鍊畫布 -->
+                <div class="canvas-container">
+                    <svg id="bracelet-svg" viewBox="0 0 300 300">
+                        <!-- 底圈 -->
+                        <circle cx="150" cy="150" r="70" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="2" id="base-circle" />
+                        <!-- 珠子容器 -->
+                        <g id="beads-group"></g>
+                    </svg>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-clear" onclick="clearBeads()">重置</button>
+                    <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">提示：點擊上方水晶即可加入手鍊</p>
+                </div>
+            </div>
         </div>
     </div>
 
+    <style>
+        /* 新增設計師相關樣式 */
+        .control-group { margin: 20px 0; }
+        input[type="range"] { width: 100%; accent-color: var(--primary-blue); }
+        
+        .bead-picker { 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            margin-bottom: 30px; 
+        }
+        
+        .bead-option { cursor: pointer; text-align: center; transition: transform 0.2s; }
+        .bead-option:hover { transform: scale(1.1); }
+        
+        .bead-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* 水晶顏色設定 */
+        .amethyst { background: radial-gradient(circle at 30% 30%, #a29bfe, #6c5ce7); }
+        .citrine { background: radial-gradient(circle at 30% 30%, #ffeaa7, #fdcb6e); }
+        .aquamarine { background: radial-gradient(circle at 30% 30%, #81ecec, #00cec9); }
+
+        .canvas-container {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        #bracelet-svg { width: 100%; max-width: 300px; height: auto; }
+
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-clear:hover { background: #c0392b; }
+    </style>
+
     <script>
+        // 切換顯示設計師
+        function showDesigner() {
+            document.getElementById('welcome-msg').style.display = 'none';
+            document.getElementById('bracelet-designer').style.display = 'block';
+            updateBracelet();
+        }
+
+        let selectedBeads = [];
+        const sizeInput = document.getElementById('bracelet-size');
+        const sizeVal = document.getElementById('size-val');
+        const beadsGroup = document.getElementById('beads-group');
+        const baseCircle = document.getElementById('base-circle');
+
+        sizeInput.addEventListener('input', () => {
+            sizeVal.innerText = sizeInput.value;
+            updateBracelet();
+        });
+
+        function addBead(type) {
+            if (selectedBeads.length >= 24) return; // 限制數量
+            selectedBeads.push(type);
+            updateBracelet();
+        }
+
+        function clearBeads() {
+            selectedBeads = [];
+            updateBracelet();
+        }
+
+        function updateBracelet() {
+            const sizeCm = parseFloat(sizeInput.value);
+            // 比例換算：14cm 對應 70px 半徑
+            const radius = (sizeCm / 14) * 70;
+            baseCircle.setAttribute('r', radius);
+
+            beadsGroup.innerHTML = '';
+            const count = selectedBeads.length;
+            
+            selectedBeads.forEach((type, index) => {
+                const angle = (index / count) * 2 * Math.PI;
+                const x = 150 + radius * Math.cos(angle);
+                const y = 150 + radius * Math.sin(angle);
+
+                const bead = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                bead.setAttribute("cx", x);
+                bead.setAttribute("cy", y);
+                bead.setAttribute("r", 8); // 珠子大小
+                
+                // 設定漸層顏色
+                let fill = "";
+                if (type === 'amethyst') fill = "url(#grad-purple)";
+                if (type === 'citrine') fill = "url(#grad-yellow)";
+                if (type === 'aquamarine') fill = "url(#grad-blue)";
+                
+                bead.setAttribute("fill", getBeadColor(type));
+                bead.setAttribute("stroke", "rgba(255,255,255,0.3)");
+                bead.setAttribute("stroke-width", "1");
+                
+                // 加入陰影效果
+                bead.style.filter = "drop-shadow(2px 2px 2px rgba(0,0,0,0.3))";
+                
+                beadsGroup.appendChild(bead);
+            });
+        }
+
+        function getBeadColor(type) {
+            const colors = {
+                amethyst: "#6c5ce7",
+                citrine: "#fdcb6e",
+                aquamarine: "#00cec9"
+            };
+            return colors[type];
+        }
+
         function toggleSubmenu(id) {
             const submenu = document.getElementById(id);
             submenu.classList.toggle('active');
-            
-            // 旋轉箭頭的小動畫（可選）
             const btn = submenu.previousElementSibling;
             const span = btn.querySelector('span');
             if (submenu.classList.contains('active')) {
