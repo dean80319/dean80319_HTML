@@ -3,617 +3,1938 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>鷗哩手作 - 水晶小學堂</title>
+    <title>鷗哩手作</title>
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         :root {
-            --primary-blue: #243b55;
-            --accent-gold: #d4af37;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --hover-blue: #1c2e44;
+            --sw: 260px;
+            --gold: #c9a227;
+            --gold-lt: #e8d07a;
+            --border: rgba(255,255,255,0.08);
+            --text: rgba(255,255,255,0.92);
+            --dim: rgba(255,255,255,0.45);
+            --card: rgba(255,255,255,0.032);
+            --t: 0.3s cubic-bezier(0.4,0,0.2,1);
         }
 
-        body { 
-            font-family: "Microsoft JhengHei", sans-serif; 
-            background-image: url('picture/background/background.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            margin: 0;
-            display: flex;
-            min-height: 100vh;
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+            color: var(--text);
+            background: #080c1e;
         }
 
-        /* 側邊欄導覽 */
+        /* ── Deep-space background ── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: -2;
+            background:
+                radial-gradient(ellipse 70% 60% at 15% 15%, rgba(90,30,180,0.18) 0%, transparent 65%),
+                radial-gradient(ellipse 55% 70% at 85% 75%, rgba(20,55,140,0.22) 0%, transparent 65%),
+                linear-gradient(150deg, #07091a 0%, #0d1230 45%, #110820 100%);
+        }
+
+        /* Star field */
+        body::after {
+            content: '';
+            position: fixed; inset: 0; z-index: -1;
+            background-image:
+                radial-gradient(1.2px 1.2px at 12% 22%, rgba(255,255,255,0.45) 0%, transparent 100%),
+                radial-gradient(1px   1px   at 33% 68%, rgba(255,255,255,0.3)  0%, transparent 100%),
+                radial-gradient(1px   1px   at 58% 30%, rgba(255,255,255,0.38) 0%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 78% 78%, rgba(255,255,255,0.28) 0%, transparent 100%),
+                radial-gradient(1px   1px   at 91% 12%, rgba(255,255,255,0.42) 0%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 45% 88%, rgba(255,255,255,0.22) 0%, transparent 100%),
+                radial-gradient(2px   2px   at 8%  83%, rgba(201,162,39,0.28) 0%, transparent 100%),
+                radial-gradient(2px   2px   at 70% 93%, rgba(201,162,39,0.18) 0%, transparent 100%);
+        }
+
+        /* ═══════════════════════════════════════════
+           LAYOUT
+        ═══════════════════════════════════════════ */
+        .layout { display: flex; height: 100vh; }
+
+        /* ── SIDEBAR ── */
         .sidebar {
-            width: 250px;
-            background: rgba(36, 59, 85, 0.9);
-            color: white;
-            padding: 2rem 1rem;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
-            box-sizing: border-box;
-            transition: margin-left 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .sidebar.collapsed {
-            margin-left: -250px;
-            box-shadow: none;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--accent-gold);
-            letter-spacing: 2px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            padding-bottom: 1rem;
-        }
-
-        /* 選單樣式 */
-        .menu-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .menu-btn {
-            width: 100%;
-            background: none;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 12px 15px;
-            text-align: left;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
+            width: var(--sw);
+            flex-shrink: 0;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            background: rgba(7,9,26,0.96);
+            border-right: 1px solid var(--border);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            transition: margin-left var(--t);
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
-        .menu-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent-gold);
-            color: var(--accent-gold);
+        .sidebar.collapsed { margin-left: calc(-1 * var(--sw)); }
+
+        /* Sidebar: logo */
+        .sb-logo {
+            padding: 1.8rem 1.5rem 1.4rem;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            flex-shrink: 0;
         }
 
-        /* 子選單 */
-        .submenu {
-            padding-left: 1.5rem;
+        .sb-brand {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #b8891a 0%, var(--gold-lt) 50%, #b8891a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sb-tagline {
+            font-size: 0.68rem;
+            letter-spacing: 3.5px;
+            color: var(--dim);
             margin-top: 5px;
-            display: none; /* 預設隱藏，點擊後展開 */
+            text-transform: uppercase;
         }
 
-        .submenu.active {
-            display: block;
+        /* Sidebar: nav */
+        .sb-nav { flex: 1; padding: 0.9rem 0.7rem; display: flex; flex-direction: column; gap: 2px; }
+
+        .nav-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            background: none;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            color: var(--dim);
+            font-size: 0.88rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--t);
+            text-align: left;
         }
+
+        .nav-btn .ico { font-size: 1.05rem; flex-shrink: 0; }
+        .nav-btn .lbl { flex: 1; }
+        .nav-btn .arr { font-size: 0.65rem; transition: transform var(--t); }
+        .nav-btn .arr.open { transform: rotate(90deg); }
+
+        .nav-btn:hover {
+            background: rgba(201,162,39,0.07);
+            border-color: rgba(201,162,39,0.18);
+            color: var(--text);
+        }
+
+        .nav-btn:hover .ico { filter: drop-shadow(0 0 7px rgba(201,162,39,0.55)); }
+
+        /* Sidebar: submenu */
+        .submenu {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.35s ease;
+            padding-left: 8px;
+        }
+
+        .submenu.open { max-height: 180px; }
 
         .sub-link {
-            display: block;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            padding: 8px 10px;
-            font-size: 0.9rem;
-            border-radius: 5px;
-            margin-bottom: 2px;
-            transition: 0.3s;
-        }
-
-        .sub-link:hover {
-            background: rgba(212, 175, 55, 0.2);
-            color: white;
-        }
-
-        /* 主內容區 */
-        .main-content {
-            flex: 1;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 2rem;
-            position: relative;
-        }
-
-        /* 收放側邊欄按鈕 */
-        .toggle-sidebar-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(36, 59, 85, 0.9);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 15px;
+            gap: 7px;
+            padding: 8px 12px;
+            color: var(--dim);
+            font-size: 0.82rem;
+            text-decoration: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.3s;
-            z-index: 1000;
+            transition: all var(--t);
+        }
+
+        .sub-link:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+
+        .nav-sep { height: 1px; background: var(--border); margin: 5px 3px; }
+
+        /* Sidebar: footer */
+        .sb-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.68rem;
+            color: var(--dim);
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* ── MAIN ── */
+        .main {
+            flex: 1;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
 
-        .toggle-sidebar-btn:hover {
-            background: var(--primary-blue);
-            color: var(--accent-gold);
-            border-color: var(--accent-gold);
-        }
-
-        .content-card {
-            background: var(--glass-bg);
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        h1 { 
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-            font-size: 2.2rem;
-        }
-
-        p { 
-            color: #555;
-            line-height: 1.6;
-            font-size: 1.1rem;
-        }
-
-        .crystal-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-    </style>
-</head>
-<body>
-
-    <!-- 側邊導覽列 -->
-    <div class="sidebar">
-        <div class="logo">鷗哩手作</div>
-        
-        <div class="menu-item">
-            <button class="menu-btn" onclick="toggleSubmenu('academy')">
-                💎 水晶小學堂 <span>▾</span>
-            </button>
-            <div id="academy" class="submenu">
-                <a href="#" class="sub-link">🔮 紫水晶</a>
-                <a href="#" class="sub-link">☀️ 黃水晶</a>
-            </div>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-btn" onclick="toggleSubmenu('crystal-handmade')">
-                📿 水晶礦石手作 <span>▾</span>
-            </button>
-            <div id="crystal-handmade" class="submenu">
-                <a href="#" class="sub-link">⚪ 串珠</a>
-                <a href="#" class="sub-link">🧶 編織</a>
-            </div>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-btn">
-                🪵 木製飾品
-            </button>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-btn" onclick="showDesigner()">
-                ✨ 手鍊DIY
-            </button>
-        </div>
-
-        <div class="menu-item">
-            <button class="menu-btn">
-                🏠 返回首頁
-            </button>
-        </div>
-    </div>
-
-    <!-- 主要內容區 -->
-    <div class="main-content">
-        <!-- 收放側邊欄按鈕 -->
-        <button class="toggle-sidebar-btn" onclick="toggleSidebar()">✕</button>
-
-        <div class="content-card" id="display-area">
-            <div id="welcome-msg">
-                <span class="crystal-icon">✨</span>
-                <h1>歡迎來到 鷗哩手作</h1>
-                <p>點擊左側的「水晶小學堂」，探索各種水晶的奧秘與能量。<br>我們致力於將大自然的禮物，轉化為陪伴您的精美手作。</p>
-            </div>
-
-            <!-- 手鍊搭配軟體區 (預設隱藏) -->
-            <div id="bracelet-designer" style="display: none;">
-                <h2 style="color: var(--primary-blue);">✨ 專屬手鍊設計師</h2>
-                
-                <!-- 尺寸調整 -->
-                <div class="control-group">
-                    <label>手圍大小: <span id="size-val">14</span> 公分</label>
-                    <input type="range" id="bracelet-size" min="12" max="16" step="0.5" value="14">
-                </div>
-
-                <!-- 礦石大小選擇 -->
-                <div class="select-group">
-                    <label for="bead-size">礦石大小:</label>
-                    <select id="bead-size">
-                        <option value="4">4mm</option>
-                        <option value="6" selected>6mm (預設)</option>
-                        <option value="8">8mm</option>
-                        <option value="10">10mm</option>
-                        <option value="12">12mm</option>
-                    </select>
-                </div>
-
-                <!-- 水晶選擇 -->
-                <div class="bead-picker">
-                    <div class="bead-option" onclick="addBead('amethyst')" title="紫水晶">
-                        <div class="bead-preview amethyst"></div>
-                        <span>紫水晶</span>
-                    </div>
-                    <div class="bead-option" onclick="addBead('citrine')" title="黃水晶">
-                        <div class="bead-preview citrine"></div>
-                        <span>黃水晶</span>
-                    </div>
-                    <div class="bead-option" onclick="addBead('aquamarine')" title="海藍寶">
-                        <div class="bead-preview aquamarine"></div>
-                        <span>海藍寶</span>
-                    </div>
-                    <div class="bead-option" onclick="addBead('tourmaline')" title="彩碧璽">
-                        <div class="bead-preview tourmaline"></div>
-                        <span>彩碧璽</span>
-                    </div>
-                    <div class="bead-option" onclick="addBead('garnet')" title="石榴石">
-                        <div class="bead-preview garnet"></div>
-                        <span>石榴石</span>
-                    </div>
-                </div>
-
-                <!-- 手鍊畫布 -->
-                <div class="canvas-container">
-                    <svg id="bracelet-svg" viewBox="0 0 300 300">
-                        <!-- 底圈 -->
-                        <circle cx="150" cy="150" r="70" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="2" id="base-circle" />
-                        <!-- 珠子容器 -->
-                        <g id="beads-group"></g>
-                    </svg>
-                </div>
-
-                <div class="actions">
-                    <button class="btn-distribute" onclick="distributeEvenly()">均勻排列</button>
-                    <button class="btn-clear" onclick="clearBeads()">重置</button>
-                    <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">提示：點擊上方水晶即可加入手鍊；按住水晶可拖曳調整位置</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        /* 新增設計師相關樣式 */
-        .control-group { margin: 20px 0; }
-        input[type="range"] { width: 100%; accent-color: var(--primary-blue); }
-        
-        .bead-picker { 
-            display: flex; 
-            justify-content: center; 
-            gap: 20px; 
-            margin-bottom: 30px; 
-        }
-        
-        .bead-option { cursor: pointer; text-align: center; transition: transform 0.2s; }
-        .bead-option:hover { transform: scale(1.1); }
-        
-        .bead-preview {
+        /* Toggle button */
+        .toggle-btn {
+            position: absolute;
+            top: 1.2rem;
+            left: 1.2rem;
+            z-index: 200;
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            margin: 0 auto 5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        /* 水晶顏色設定 */
-        .amethyst { background: radial-gradient(circle at 30% 30%, #a29bfe, #6c5ce7); }
-        .citrine { background: radial-gradient(circle at 30% 30%, #ffeaa7, #fdcb6e); }
-        .aquamarine { background: radial-gradient(circle at 30% 30%, #81ecec, #00cec9); }
-        .tourmaline { background: linear-gradient(135deg, #ff7675, #ffeaa7, #55efc4, #a29bfe); }
-        .garnet { background: radial-gradient(circle at 30% 30%, #ff7675, #8b0000); }
-
-        .canvas-container {
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        /* 礦石大小選擇器樣式 */
-        .select-group {
-            margin: 15px 0;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.055);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--t);
+            backdrop-filter: blur(10px);
+        }
+
+        .toggle-btn:hover {
+            background: rgba(201,162,39,0.1);
+            border-color: rgba(201,162,39,0.3);
+            color: var(--gold-lt);
+        }
+
+        /* ═══════════════════════════════════════════
+           PAGES
+        ═══════════════════════════════════════════ */
+        .page {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            max-height: calc(100vh - 3.5rem);
+            overflow-y: auto;
+            padding: 0 1rem;
+            animation: fadeUp 0.38s ease;
+        }
+
+        .page.active { display: block; }
+
+        .page::-webkit-scrollbar { width: 3px; }
+        .page::-webkit-scrollbar-track { background: transparent; }
+        .page::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass card */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 2.4rem 2.2rem;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.025),
+                0 22px 64px rgba(0,0,0,0.55),
+                inset 0 1px 0 rgba(255,255,255,0.06);
+            /* Top gold accent line */
+            border-top: 1px solid rgba(201,162,39,0.3);
+        }
+
+        /* ═══════════════════════════════════════════
+           WELCOME PAGE
+        ═══════════════════════════════════════════ */
+        .welcome-icon {
+            font-size: 3.6rem;
+            display: block;
+            text-align: center;
+            margin-bottom: 1.2rem;
+            animation: floatY 4s ease-in-out infinite;
+        }
+
+        @keyframes floatY {
+            0%, 100% { transform: translateY(0);   }
+            50%       { transform: translateY(-9px); }
+        }
+
+        .welcome-title {
+            text-align: center;
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            background: linear-gradient(130deg, #fff 10%, var(--gold-lt) 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-body {
+            text-align: center;
+            color: var(--dim);
+            font-size: 0.92rem;
+            line-height: 1.9;
+        }
+
+        .tag-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 1.6rem;
+        }
+
+        .tag {
+            padding: 5px 13px;
+            border-radius: 20px;
+            background: rgba(201,162,39,0.09);
+            border: 1px solid rgba(201,162,39,0.22);
+            font-size: 0.78rem;
+            color: var(--gold-lt);
+            letter-spacing: 0.5px;
+        }
+
+        /* ═══════════════════════════════════════════
+           BRACELET DESIGNER
+        ═══════════════════════════════════════════ */
+        .sec-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Controls */
+        .ctrl {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0.9rem;
+        }
+
+        .ctrl-lbl {
+            font-size: 0.82rem;
+            color: var(--dim);
+            white-space: nowrap;
+            width: 62px;
+        }
+
+        .ctrl-val { color: var(--gold-lt); font-weight: 600; font-size: 0.85rem; }
+
+        input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px; height: 15px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(201,162,39,0.5);
+        }
+
+        select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #141b2e;
+            color: var(--text);
+            font-size: 0.82rem;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+        }
+
+        select:focus { border-color: rgba(201,162,39,0.35); }
+
+        select option {
+            background: #141b2e;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Crystal picker */
+        .crystal-row {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin: 1rem 0 0.4rem;
+        }
+
+        .c-opt {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: transform var(--t);
+        }
+
+        .c-opt:hover { transform: translateY(-5px); }
+
+        .c-sphere {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            position: relative;
+            box-shadow:
+                0 4px 14px rgba(0,0,0,0.45),
+                inset 0 -3px 7px rgba(0,0,0,0.35),
+                inset 0 3px 5px rgba(255,255,255,0.28);
+            transition: box-shadow var(--t);
+        }
+
+        .c-opt:hover .c-sphere {
+            box-shadow:
+                0 6px 20px rgba(0,0,0,0.5),
+                0 0 14px var(--glow, rgba(201,162,39,0.3)),
+                inset 0 -3px 7px rgba(0,0,0,0.35),
+                inset 0 3px 5px rgba(255,255,255,0.28);
+        }
+
+        /* Specular highlight on sphere */
+        .c-sphere::after {
+            content: '';
+            position: absolute;
+            top: 17%; left: 17%;
+            width: 28%; height: 18%;
+            background: rgba(255,255,255,0.58);
+            border-radius: 50%;
+            transform: rotate(-28deg);
+        }
+
+        .c-name { font-size: 0.7rem; color: var(--dim); }
+
+        /* Crystal colors */
+        .sph-amethyst   { background: radial-gradient(circle at 35% 30%, #c4b5fd, #7c3aed 50%, #4c1d95); --glow: rgba(124,58,237,0.4); }
+        .sph-citrine    { background: radial-gradient(circle at 35% 30%, #fef3c7, #f59e0b 50%, #92400e); --glow: rgba(245,158,11,0.4); }
+        .sph-aquamarine { background: radial-gradient(circle at 35% 30%, #a5f3fc, #06b6d4 50%, #164e63); --glow: rgba(6,182,212,0.4); }
+        .sph-tourmaline { background: radial-gradient(circle at 35% 30%, #fda4af, #f43f5e 35%, #6d28d9); --glow: rgba(244,63,94,0.3); }
+        .sph-garnet     { background: radial-gradient(circle at 35% 30%, #fca5a5, #dc2626 50%, #7f1d1d); --glow: rgba(220,38,38,0.4); }
+
+        /* SVG canvas */
+        .svg-wrap {
+            background: rgba(0,0,0,0.28);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 10px;
+            margin: 0.8rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        #bracelet-svg { width: 100%; max-width: 250px; height: auto; }
+
+        /* Buttons */
+        .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+        .btn {
+            padding: 9px 20px;
+            border-radius: 10px;
+            font-size: 0.83rem;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all var(--t);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-gold {
+            background: rgba(201,162,39,0.1);
+            border-color: rgba(201,162,39,0.28);
+            color: var(--gold-lt);
+        }
+
+        .btn-gold:hover {
+            background: rgba(201,162,39,0.18);
+            border-color: var(--gold);
+            box-shadow: 0 0 14px rgba(201,162,39,0.15);
+        }
+
+        .btn-red {
+            background: rgba(220,38,38,0.09);
+            border-color: rgba(220,38,38,0.22);
+            color: #fca5a5;
+        }
+
+        .btn-red:hover {
+            background: rgba(220,38,38,0.18);
+            border-color: rgba(220,38,38,0.5);
+        }
+
+        .hint {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--dim);
+            margin-top: 7px;
+        }
+
+        /* ═══════════════════════════════════════════
+           DIVINATION RESULT PAGE
+        ═══════════════════════════════════════════ */
+        .div-icon {
+            font-size: 4rem;
+            display: block;
+            text-align: center;
+            margin-bottom: 1rem;
+            animation: pulseGem 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseGem {
+            0%, 100% { filter: drop-shadow(0 0 6px rgba(201,162,39,0.3));  transform: scale(1);    }
+            50%       { filter: drop-shadow(0 0 22px rgba(201,162,39,0.7)); transform: scale(1.08); }
+        }
+
+        .div-title {
+            text-align: center;
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 1.4rem;
+            background: linear-gradient(130deg, var(--gold-lt) 0%, #fff 50%, var(--gold-lt) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .div-box {
+            border: 1px dashed rgba(201,162,39,0.3);
+            border-radius: 14px;
+            padding: 1.5rem 1.8rem;
+            background: rgba(201,162,39,0.035);
+            animation: fadeUp 1s ease;
+        }
+
+        .div-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 0;
+            font-size: 1.05rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.055);
+        }
+
+        .div-line:last-child { border-bottom: none; padding-bottom: 0; }
+        .div-line:first-child { padding-top: 0; }
+
+        .div-line::before {
+            content: '✦';
+            color: var(--gold);
+            font-size: 0.65rem;
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════════════════
+           DIVINATION ANIMATION OVERLAY
+        ═══════════════════════════════════════════ */
+        #div-overlay {
+            position: fixed; inset: 0;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(ellipse 80% 70% at 50% 40%, #10082e 0%, #030412 70%, #000 100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.55s ease;
+        }
+
+        #div-overlay.show { opacity: 1; pointer-events: all; }
+
+        /* Canvas sits full-screen behind everything in the overlay */
+        #anim-canvas {
+            position: absolute; inset: 0;
+            pointer-events: none;
+        }
+
+        /* Ball scene: springs in */
+        #cb-scene {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            transform: scale(0.08);
+            opacity: 0;
+            transition:
+                transform 0.72s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity   0.4s  ease;
+        }
+
+        #cb-scene.appear { transform: scale(1); opacity: 1; }
+
+        /* Crystal ball shell */
+        .cb-ball {
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 120%, rgba(255,255,255,0.09), rgba(10,5,30,0.7) 65%);
+            border: 1px solid rgba(200,180,255,0.18);
+            box-shadow:
+                0 0 60px rgba(100,60,220,0.22),
+                0 0 120px rgba(80,40,200,0.10),
+                inset 0 0 35px rgba(255,255,255,0.06),
+                inset 0 -25px 55px rgba(0,0,0,0.75);
+            backdrop-filter: blur(6px);
+        }
+
+        /* Aurora layer 1 — purple/blue, rotates CW */
+        .cb-aurora1 {
+            position: absolute; inset: -18%;
+            background: conic-gradient(from 0deg at 50% 55%,
+                transparent 0deg,
+                rgba(110, 55, 230, 0.65) 55deg,
+                rgba(150, 80, 255, 0.40) 90deg,
+                transparent 140deg,
+                rgba( 50,120, 220, 0.45) 210deg,
+                transparent 270deg,
+                rgba(170, 70, 255, 0.55) 330deg,
+                transparent 360deg
+            );
+            filter: blur(18px);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.9s ease;
+        }
+
+        .cb-aurora1.on {
+            opacity: 1;
+            animation: auroraCW 7.5s linear infinite;
+        }
+
+        @keyframes auroraCW {
+            from { transform: rotate(0deg)   scale(1.0); }
+            to   { transform: rotate(360deg) scale(1.08); }
+        }
+
+        /* Aurora layer 2 — teal/gold, rotates CCW */
+        .cb-aurora2 {
+            position: absolute; inset: -18%;
+            background: conic-gradient(from 80deg at 45% 45%,
+                transparent 0deg,
+                rgba( 40, 200, 200, 0.45) 50deg,
+                transparent 110deg,
+                rgba(210, 160,  35, 0.55) 190deg,
+                rgba(255, 200,  60, 0.30) 230deg,
+                transparent 280deg,
+                rgba( 60, 170, 255, 0.35) 330deg,
+                transparent 360deg
+            );
+            filter: blur(15px);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.9s ease;
+        }
+
+        .cb-aurora2.on {
+            opacity: 1;
+            animation: auroraCCW 5.2s linear infinite;
+        }
+
+        @keyframes auroraCCW {
+            from { transform: rotate(0deg)    scale(0.92); }
+            to   { transform: rotate(-360deg) scale(1.0);  }
+        }
+
+        /* Inner glow — builds from nothing to white-gold */
+        .cb-iglow {
+            position: absolute; inset: 0;
+            border-radius: 50%;
+            background: transparent;
+            transition: background 2s ease, filter 2s ease;
+            filter: blur(4px);
+        }
+
+        .cb-iglow.bright {
+            background: radial-gradient(circle at 50% 62%,
+                rgba(255,255,255,1.0)  0%,
+                rgba(255,230, 90,0.85) 25%,
+                rgba(201,162, 39,0.50) 55%,
+                transparent 80%
+            );
+        }
+
+        /* Glass reflex */
+        .cb-reflex {
+            position: absolute;
+            top: 8%; left: 14%;
+            width: 48px; height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.65), transparent);
+            transform: rotate(-30deg);
+            pointer-events: none;
+        }
+
+        /* Base plinth */
+        .cb-base {
+            width: 135px; height: 42px;
+            background: linear-gradient(to right, #3730a3, #1e1b4b 50%, #3730a3);
+            border-radius: 8px 8px 16px 16px;
+            border: 1px solid rgba(180,160,255,0.12);
+            box-shadow:
+                0 14px 28px rgba(0,0,0,0.65),
+                0  0  40px rgba(80,60,200,0.18),
+                inset 0 2px 5px rgba(255,255,255,0.16);
+            margin-top: -12px;
+            position: relative;
+            z-index: -1;
+        }
+
+        /* Oracle text below the base */
+        .oracle-text {
+            margin-top: 22px;
+            font-size: 0.82rem;
+            letter-spacing: 5px;
+            color: rgba(201,162,39,0);
+            transition: color 1.1s ease;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .oracle-text.visible { color: rgba(201,162,39,0.75); }
+
+        /* Screen flash */
+        #screen-flash {
+            position: fixed; inset: 0;
+            z-index: 10001;
+            background: radial-gradient(circle, #fffdf0 0%, #fff 100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-out;
+        }
+
+        #screen-flash.flash { opacity: 1; transition: opacity 0.14s ease-out; }
+
+        /* ═══════════════════════════════════════════
+           TAROT DAILY DRAW
+        ═══════════════════════════════════════════ */
+        .tarot-btn {
+            display: inline-block;
+            margin-top: 1.8rem;
+            padding: 11px 30px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(90,50,180,0.18), rgba(201,162,39,0.12));
+            border: 1px solid rgba(201,162,39,0.32);
+            color: var(--gold-lt);
+            font-size: 0.85rem;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: 3.5px;
+            transition: all var(--t);
+        }
+
+        .tarot-btn:hover {
+            background: linear-gradient(135deg, rgba(90,50,180,0.28), rgba(201,162,39,0.22));
+            border-color: var(--gold);
+            box-shadow: 0 0 22px rgba(201,162,39,0.18), 0 0 44px rgba(90,50,180,0.12);
+        }
+
+        /* Reveal container */
+        .tarot-reveal {
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 1.8rem;
+        }
+
+        /* 3-D flip */
+        .flip-scene {
+            width: 178px;
+            height: 288px;
+            perspective: 900px;
+            flex-shrink: 0;
+        }
+
+        .flip-card {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.9s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .flip-card.flipped { transform: rotateY(180deg); }
+
+        .flip-face {
+            position: absolute; inset: 0;
+            border-radius: 14px;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            overflow: hidden;
+            border: 1px solid rgba(201,162,39,0.28);
+            box-shadow: 0 10px 36px rgba(0,0,0,0.55);
+        }
+
+        /* Card back */
+        .flip-back {
+            background: radial-gradient(ellipse at 50% 38%, #1c1040, #06051a);
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 10px;
         }
-        .select-group label {
-            font-weight: bold;
-            color: var(--primary-blue);
-        }
-        .select-group select {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            background-white: white;
-            cursor: pointer;
-            accent-color: var(--primary-blue);
+
+        .flip-back::before {
+            content: '';
+            position: absolute; inset: 9px;
+            border: 1px solid rgba(201,162,39,0.18);
+            border-radius: 8px;
         }
 
-        #bracelet-svg { width: 100%; max-width: 300px; height: auto; }
+        .back-sym  { font-size: 2.4rem; opacity: 0.55; }
+        .back-name { font-size: 0.62rem; letter-spacing: 4px; color: rgba(201,162,39,0.45); }
 
-        .btn-distribute {
-            background: var(--primary-blue);
-            color: white;
-            border: 1px solid var(--accent-gold);
-            padding: 8px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-right: 10px;
-        }
-        .btn-distribute:hover { 
-            background: var(--hover-blue);
-            color: var(--accent-gold);
+        /* Card front */
+        .flip-front {
+            transform: rotateY(180deg);
+            background: #050415;
+            display: flex;
+            flex-direction: column;
         }
 
-        .btn-clear {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
+        .card-num {
+            text-align: center;
+            font-size: 0.62rem;
+            letter-spacing: 3px;
+            color: rgba(201,162,39,0.55);
+            padding: 7px 0 3px;
+            flex-shrink: 0;
         }
-        .btn-clear:hover { background: #c0392b; }
+
+        .card-art-wrap { flex: 1; overflow: hidden; }
+        .card-art-wrap svg { width: 100%; height: 100%; display: block; }
+
+        .card-name-plate {
+            background: rgba(0,0,0,0.55);
+            border-top: 1px solid rgba(201,162,39,0.22);
+            padding: 7px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .card-name-zh { font-size: 0.85rem; font-weight: 600; color: var(--gold-lt); letter-spacing: 2px; }
+        .card-name-en { font-size: 0.56rem; color: var(--dim); letter-spacing: 1px; margin-top: 2px; }
+
+        /* Fortune text */
+        .fortune-text {
+            background: rgba(201,162,39,0.04);
+            border: 1px solid rgba(201,162,39,0.18);
+            border-radius: 12px;
+            padding: 1.1rem 1.3rem;
+            font-size: 0.86rem;
+            line-height: 1.9;
+            color: rgba(255,255,255,0.78);
+            text-align: center;
+            letter-spacing: 0.3px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.85s ease, transform 0.85s ease;
+        }
+
+        .fortune-text.show { opacity: 1; transform: translateY(0); }
     </style>
+</head>
+<body>
 
-    <script>
-        // 切換顯示設計師
-        function showDesigner() {
-            document.getElementById('welcome-msg').style.display = 'none';
-            document.getElementById('bracelet-designer').style.display = 'block';
-            updateBracelet();
+<div class="layout">
+
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <nav class="sidebar" id="sidebar">
+
+        <div class="sb-logo">
+            <div class="sb-brand">鷗哩手作</div>
+            <div class="sb-tagline">Handmade Crystal Studio</div>
+        </div>
+
+        <div class="sb-nav">
+
+            <div>
+                <button class="nav-btn" onclick="toggleSub('sub-academy', this)">
+                    <span class="ico">💎</span>
+                    <span class="lbl">水晶小學堂</span>
+                    <span class="arr">▶</span>
+                </button>
+                <div class="submenu" id="sub-academy">
+                    <a class="sub-link" href="#">🟣 紫水晶</a>
+                    <a class="sub-link" href="#">🟡 黃水晶</a>
+                </div>
+            </div>
+
+            <div>
+                <button class="nav-btn" onclick="toggleSub('sub-handmade', this)">
+                    <span class="ico">📿</span>
+                    <span class="lbl">水晶礦石手作</span>
+                    <span class="arr">▶</span>
+                </button>
+                <div class="submenu" id="sub-handmade">
+                    <a class="sub-link" href="#">⚪ 串珠</a>
+                    <a class="sub-link" href="#">🧶 編織</a>
+                </div>
+            </div>
+
+            <div>
+                <button class="nav-btn">
+                    <span class="ico">🪵</span>
+                    <span class="lbl">木製飾品</span>
+                </button>
+            </div>
+
+            <div class="nav-sep"></div>
+
+            <div>
+                <button class="nav-btn" onclick="showPage('designer')">
+                    <span class="ico">✨</span>
+                    <span class="lbl">手鍊 DIY</span>
+                </button>
+            </div>
+
+            <div>
+                <button class="nav-btn" onclick="startDivination()">
+                    <span class="ico">🔮</span>
+                    <span class="lbl">占卜</span>
+                </button>
+            </div>
+
+            <div class="nav-sep"></div>
+
+            <div>
+                <button class="nav-btn" onclick="showPage('welcome')">
+                    <span class="ico">🏠</span>
+                    <span class="lbl">返回首頁</span>
+                </button>
+            </div>
+
+        </div>
+
+        <div class="sb-footer">© 2026 鷗哩手作</div>
+
+    </nav>
+
+    <!-- ═══════════ MAIN ═══════════ -->
+    <main class="main">
+
+        <button class="toggle-btn" id="toggle-btn" onclick="toggleSidebar()">✕</button>
+
+        <!-- ── Welcome ── -->
+        <div class="page active" id="page-welcome">
+            <div class="card">
+                <span class="welcome-icon">✨</span>
+                <h1 class="welcome-title">歡迎來到 鷗哩手作</h1>
+                <p class="welcome-body">
+                    探索水晶的奧秘與能量<br>
+                    讓我們將大自然的禮物<br>
+                    轉化為陪伴您的精美手作
+                </p>
+                <div class="tag-row">
+                    <span class="tag">水晶小學堂</span>
+                    <span class="tag">手鍊 DIY</span>
+                    <span class="tag">礦石手作</span>
+                    <span class="tag">水晶占卜</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Bracelet Designer ── -->
+        <div class="page" id="page-designer">
+            <div class="card">
+                <div class="sec-title">✨ 專屬手鍊設計師</div>
+
+                <div class="ctrl">
+                    <span class="ctrl-lbl">手圍大小</span>
+                    <input type="range" id="bracelet-size" min="12" max="20" step="0.5" value="14">
+                    <span class="ctrl-val"><span id="size-val">14</span> cm</span>
+                </div>
+
+                <div class="ctrl">
+                    <span class="ctrl-lbl">礦石大小</span>
+                    <select id="bead-size">
+                        <option value="4">4 mm</option>
+                        <option value="6" selected>6 mm</option>
+                        <option value="8">8 mm</option>
+                        <option value="10">10 mm</option>
+                        <option value="12">12 mm</option>
+                    </select>
+                </div>
+
+                <div class="crystal-row">
+                    <div class="c-opt" onclick="addBead('amethyst')">
+                        <div class="c-sphere sph-amethyst"></div>
+                        <span class="c-name">紫水晶</span>
+                    </div>
+                    <div class="c-opt" onclick="addBead('citrine')">
+                        <div class="c-sphere sph-citrine"></div>
+                        <span class="c-name">黃水晶</span>
+                    </div>
+                    <div class="c-opt" onclick="addBead('aquamarine')">
+                        <div class="c-sphere sph-aquamarine"></div>
+                        <span class="c-name">海藍寶</span>
+                    </div>
+                    <div class="c-opt" onclick="addBead('tourmaline')">
+                        <div class="c-sphere sph-tourmaline"></div>
+                        <span class="c-name">彩碧璽</span>
+                    </div>
+                    <div class="c-opt" onclick="addBead('garnet')">
+                        <div class="c-sphere sph-garnet"></div>
+                        <span class="c-name">石榴石</span>
+                    </div>
+                </div>
+
+                <div class="svg-wrap">
+                    <svg id="bracelet-svg" viewBox="0 0 300 300">
+                        <defs>
+                            <!-- Bead gradients -->
+                            <radialGradient id="g-amethyst"   cx="35%" cy="30%" r="65%">
+                                <stop offset="0%"   stop-color="#c4b5fd"/>
+                                <stop offset="50%"  stop-color="#7c3aed"/>
+                                <stop offset="100%" stop-color="#3b0764"/>
+                            </radialGradient>
+                            <radialGradient id="g-citrine"    cx="35%" cy="30%" r="65%">
+                                <stop offset="0%"   stop-color="#fef3c7"/>
+                                <stop offset="50%"  stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#78350f"/>
+                            </radialGradient>
+                            <radialGradient id="g-aquamarine" cx="35%" cy="30%" r="65%">
+                                <stop offset="0%"   stop-color="#a5f3fc"/>
+                                <stop offset="50%"  stop-color="#06b6d4"/>
+                                <stop offset="100%" stop-color="#0c4a6e"/>
+                            </radialGradient>
+                            <radialGradient id="g-tourmaline" cx="35%" cy="30%" r="65%">
+                                <stop offset="0%"   stop-color="#fda4af"/>
+                                <stop offset="38%"  stop-color="#f43f5e"/>
+                                <stop offset="100%" stop-color="#581c87"/>
+                            </radialGradient>
+                            <radialGradient id="g-garnet"     cx="35%" cy="30%" r="65%">
+                                <stop offset="0%"   stop-color="#fca5a5"/>
+                                <stop offset="50%"  stop-color="#dc2626"/>
+                                <stop offset="100%" stop-color="#450a0a"/>
+                            </radialGradient>
+                            <!-- Ring glow filter -->
+                            <filter id="ring-glow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <!-- Bead shadow filter -->
+                            <filter id="bead-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                                <feDropShadow dx="1" dy="2" stdDeviation="2.2" flood-opacity="0.55"/>
+                            </filter>
+                        </defs>
+                        <!-- Bracelet ring -->
+                        <circle cx="150" cy="150" id="base-circle"
+                                fill="none"
+                                stroke="rgba(201,162,39,0.28)"
+                                stroke-width="1.5"
+                                stroke-dasharray="5 3.5"
+                                filter="url(#ring-glow)"
+                                r="70"/>
+                        <g id="beads-group"></g>
+                    </svg>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-gold" onclick="distributeEvenly()">均勻排列</button>
+                    <button class="btn btn-red"  onclick="clearBeads()">重置</button>
+                </div>
+                <p class="hint">點擊水晶加入手鍊 &middot; 按住珠子可拖曳調整位置</p>
+            </div>
+        </div>
+
+        <!-- ── Divination Result ── -->
+        <div class="page" id="page-divination">
+            <div class="card">
+                <span class="div-icon">🔮</span>
+                <h1 class="div-title">命運啟示</h1>
+                <div class="div-box">
+                    <div class="div-line">占術：看見、解釋、當下</div>
+                    <div class="div-line">卜術：預測、宏觀、未來</div>
+                </div>
+
+                <div style="text-align:center;">
+                    <button class="tarot-btn" id="tarot-btn" onclick="drawCard()">✦ 宇宙引路 ✦</button>
+                </div>
+
+                <div class="tarot-reveal" id="tarot-reveal" style="display:none;">
+                    <div class="flip-scene">
+                        <div class="flip-card" id="flip-card">
+                            <div class="flip-face flip-back">
+                                <div class="back-sym">✦</div>
+                                <div class="back-name">鷗哩手作</div>
+                            </div>
+                            <div class="flip-face flip-front" id="flip-front"></div>
+                        </div>
+                    </div>
+                    <div class="fortune-text" id="fortune-text"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ═══════════ OVERLAYS ═══════════ -->
+<div id="div-overlay" style="display:none;">
+    <canvas id="anim-canvas"></canvas>
+    <div id="cb-scene">
+        <div class="cb-ball">
+            <div class="cb-aurora1" id="cb-aurora1"></div>
+            <div class="cb-aurora2" id="cb-aurora2"></div>
+            <div class="cb-iglow"   id="cb-iglow"></div>
+            <div class="cb-reflex"></div>
+        </div>
+        <div class="cb-base"></div>
+        <div class="oracle-text" id="oracle-text">✦ 命運正在揭示 ✦</div>
+    </div>
+</div>
+<div id="screen-flash"></div>
+
+<script>
+    // ─── Page switching ───
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const el = document.getElementById('page-' + id);
+        if (el) el.classList.add('active');
+        if (id === 'designer') updateBracelet();
+    }
+
+    // ─── Sidebar ───
+    function toggleSidebar() {
+        const sb  = document.getElementById('sidebar');
+        const btn = document.getElementById('toggle-btn');
+        sb.classList.toggle('collapsed');
+        btn.textContent = sb.classList.contains('collapsed') ? '☰' : '✕';
+    }
+
+    function toggleSub(id, btn) {
+        const sub   = document.getElementById(id);
+        const arrow = btn.querySelector('.arr');
+        sub.classList.toggle('open');
+        arrow.classList.toggle('open');
+    }
+
+    // ─── Bracelet Designer ───
+    let selectedBeads    = [];
+    let draggedBeadIndex = null;
+
+    const sizeInput    = document.getElementById('bracelet-size');
+    const sizeValSpan  = document.getElementById('size-val');
+    const beadSizeInput = document.getElementById('bead-size');
+    const beadsGroup   = document.getElementById('beads-group');
+    const baseCircle   = document.getElementById('base-circle');
+    const braceletSvg  = document.getElementById('bracelet-svg');
+
+    sizeInput.addEventListener('input', () => {
+        sizeValSpan.textContent = sizeInput.value;
+        updateBracelet();
+    });
+
+    function getNextBeadAngle() {
+        if (selectedBeads.length === 0) return 0;
+        if (selectedBeads.length === 1) return (selectedBeads[0].angle + Math.PI) % (2 * Math.PI);
+
+        const angles = selectedBeads.map(b => {
+            let a = b.angle % (2 * Math.PI);
+            return a < 0 ? a + 2 * Math.PI : a;
+        }).sort((a, b) => a - b);
+
+        let maxGap = 0, insertAngle = 0;
+        for (let i = 0; i < angles.length; i++) {
+            const cur = angles[i];
+            const nxt = angles[(i + 1) % angles.length];
+            const gap = nxt > cur ? nxt - cur : nxt + 2 * Math.PI - cur;
+            if (gap > maxGap) { maxGap = gap; insertAngle = (cur + gap / 2) % (2 * Math.PI); }
         }
+        return insertAngle;
+    }
 
-        let selectedBeads = [];
-        let draggedBeadIndex = null;
-        const sizeInput = document.getElementById('bracelet-size');
-        const sizeVal = document.getElementById('size-val');
-        const beadSizeInput = document.getElementById('bead-size');
-        const beadsGroup = document.getElementById('beads-group');
-        const baseCircle = document.getElementById('base-circle');
-        const braceletSvg = document.getElementById('bracelet-svg');
+    function addBead(type) {
+        if (selectedBeads.length >= 24) return;
+        const size = parseFloat(beadSizeInput.value) || 6;
+        selectedBeads.push({ type, size, angle: getNextBeadAngle() });
+        updateBracelet();
+    }
 
-        sizeInput.addEventListener('input', () => {
-            sizeVal.innerText = sizeInput.value;
-            updateBracelet();
-        });
+    function distributeEvenly() {
+        const n = selectedBeads.length;
+        selectedBeads.forEach((b, i) => { b.angle = (i / n) * 2 * Math.PI; });
+        updateBracelet();
+    }
 
-        // 當選擇大小改變時，不自動更新舊的珠子，只影響之後新增的
-        beadSizeInput.addEventListener('change', () => {
-            // updateBracelet(); // 移除此行以保留個別珠子大小
-        });
+    function clearBeads() {
+        selectedBeads = [];
+        updateBracelet();
+    }
 
-        function getNextBeadAngle() {
-            if (selectedBeads.length === 0) {
-                return 0; // 第一顆放在 0 度 (右側)
-            }
-            if (selectedBeads.length === 1) {
-                // 第二顆放在對向 (180度)
-                return (selectedBeads[0].angle + Math.PI) % (2 * Math.PI);
-            }
+    const NS = "http://www.w3.org/2000/svg";
 
-            // 取得所有珠子的角度並正規化到 [0, 2*Math.PI)
-            const angles = selectedBeads.map(b => {
-                let a = b.angle % (2 * Math.PI);
-                if (a < 0) a += 2 * Math.PI;
-                return a;
+    function updateBracelet() {
+        const sizeCm = parseFloat(sizeInput.value);
+        const radius = (sizeCm / 14) * 70;
+        baseCircle.setAttribute('r', radius);
+        beadsGroup.innerHTML = '';
+
+        selectedBeads.forEach((bead, index) => {
+            const r = bead.size * (8 / 6);
+            const x = 150 + radius * Math.cos(bead.angle);
+            const y = 150 + radius * Math.sin(bead.angle);
+            const isDragging = draggedBeadIndex === index;
+
+            // Bead circle
+            const circle = document.createElementNS(NS, "circle");
+            circle.setAttribute("cx", x);
+            circle.setAttribute("cy", y);
+            circle.setAttribute("r", r);
+            circle.setAttribute("fill", `url(#g-${bead.type})`);
+            circle.setAttribute("stroke", isDragging ? "#e8d07a" : "rgba(255,255,255,0.2)");
+            circle.setAttribute("stroke-width", isDragging ? "2" : "1");
+            circle.setAttribute("filter", "url(#bead-shadow)");
+            circle.style.cursor = isDragging ? "grabbing" : "grab";
+
+            circle.addEventListener('mousedown', e => {
+                draggedBeadIndex = index;
+                circle.style.cursor = "grabbing";
+                e.stopPropagation();
             });
 
-            // 排序
-            angles.sort((a, b) => a - b);
+            circle.addEventListener('touchstart', e => {
+                draggedBeadIndex = index;
+                e.stopPropagation();
+            }, { passive: true });
 
-            // 尋找最大空隙
-            let maxGap = 0;
-            let insertAngle = 0;
+            beadsGroup.appendChild(circle);
 
-            for (let i = 0; i < angles.length; i++) {
-                const current = angles[i];
-                const next = angles[(i + 1) % angles.length];
-                
-                let gap;
-                if (next > current) {
-                    gap = next - current;
-                } else {
-                    // 跨越 0 度的最後一個間隙
-                    gap = (next + 2 * Math.PI) - current;
-                }
+            // Specular highlight
+            const shine = document.createElementNS(NS, "ellipse");
+            const ox = Math.cos(bead.angle - 0.6) * r * 0.28;
+            const oy = Math.sin(bead.angle - 0.6) * r * 0.28;
+            shine.setAttribute("cx", x + ox - r * 0.12);
+            shine.setAttribute("cy", y + oy - r * 0.12);
+            shine.setAttribute("rx", r * 0.24);
+            shine.setAttribute("ry", r * 0.14);
+            shine.setAttribute("fill", "rgba(255,255,255,0.5)");
+            shine.setAttribute("transform", `rotate(-28,${x},${y})`);
+            shine.style.pointerEvents = "none";
+            beadsGroup.appendChild(shine);
+        });
+    }
 
-                if (gap > maxGap) {
-                    maxGap = gap;
-                    insertAngle = (current + gap / 2) % (2 * Math.PI);
-                }
-            }
+    // Drag — mouse
+    braceletSvg.addEventListener('mousemove', e => {
+        if (draggedBeadIndex === null) return;
+        const rect = braceletSvg.getBoundingClientRect();
+        const svgX = (e.clientX - rect.left) * (300 / rect.width);
+        const svgY = (e.clientY - rect.top)  * (300 / rect.height);
+        let angle = Math.atan2(svgY - 150, svgX - 150);
+        if (angle < 0) angle += 2 * Math.PI;
+        selectedBeads[draggedBeadIndex].angle = angle;
+        updateBracelet();
+    });
 
-            return insertAngle;
+    window.addEventListener('mouseup', () => {
+        if (draggedBeadIndex !== null) { draggedBeadIndex = null; updateBracelet(); }
+    });
+
+    // Drag — touch
+    braceletSvg.addEventListener('touchmove', e => {
+        if (draggedBeadIndex === null) return;
+        const touch = e.touches[0];
+        const rect  = braceletSvg.getBoundingClientRect();
+        const svgX  = (touch.clientX - rect.left) * (300 / rect.width);
+        const svgY  = (touch.clientY - rect.top)  * (300 / rect.height);
+        let angle   = Math.atan2(svgY - 150, svgX - 150);
+        if (angle < 0) angle += 2 * Math.PI;
+        selectedBeads[draggedBeadIndex].angle = angle;
+        updateBracelet();
+        e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('touchend', () => {
+        if (draggedBeadIndex !== null) { draggedBeadIndex = null; updateBracelet(); }
+    });
+
+    // ─── Tarot System ───
+
+    // Deterministic hash → 0..1
+    function _r(n) {
+        n = Math.abs(n) | 0;
+        n = (n ^ 61) ^ (n >>> 16);
+        n = (n + (n << 3)) & 0x7fffffff;
+        n = n ^ (n >>> 4);
+        n = (n * 0x27d4eb2d) & 0x7fffffff;
+        n = n ^ (n >>> 15);
+        return n / 0x7fffffff;
+    }
+
+    function starField(uid, count, col) {
+        let s = '';
+        for (let i = 0; i < count; i++) {
+            const x = (_r(uid * 997 + i)       * 196 + 2).toFixed(1);
+            const y = (_r(uid * 997 + i + 500)  * 196 + 2).toFixed(1);
+            const r = (0.3 + _r(uid * 997 + i + 250) * 1.3).toFixed(1);
+            const o = (0.2 + _r(uid * 997 + i + 750) * 0.68).toFixed(2);
+            s += `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="${o}"/>`;
         }
+        return s;
+    }
 
-        function addBead(type) {
-            if (selectedBeads.length >= 24) return; // 限制數量
-            const currentSize = parseFloat(beadSizeInput.value) || 6;
-            
-            // 計算新珠子的最佳角度，使其在最大空隙中且不影響其他已移動水晶
-            const nextAngle = getNextBeadAngle();
-            selectedBeads.push({ type: type, size: currentSize, angle: nextAngle });
-            updateBracelet();
-        }
-
-        function redistributeBeads() {
-            const count = selectedBeads.length;
-            selectedBeads.forEach((bead, index) => {
-                bead.angle = (index / count) * 2 * Math.PI;
-            });
-        }
-
-        function distributeEvenly() {
-            redistributeBeads();
-            updateBracelet();
-        }
-
-        function clearBeads() {
-            selectedBeads = [];
-            updateBracelet();
-        }
-
-        function updateBracelet() {
-            const sizeCm = parseFloat(sizeInput.value);
-            // 比例換算：14cm 對應 70px 半徑
-            const radius = (sizeCm / 14) * 70;
-            baseCircle.setAttribute('r', radius);
-
-            beadsGroup.innerHTML = '';
-
-            selectedBeads.forEach((beadData, index) => {
-                const type = beadData.type;
-                const beadSize = beadData.size;
-                const beadRadius = beadSize * (8 / 6); // 基礎 6mm 對應 8px 半徑
-                const angle = beadData.angle;
-
-                const x = 150 + radius * Math.cos(angle);
-                const y = 150 + radius * Math.sin(angle);
-
-                const bead = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                bead.setAttribute("cx", x);
-                bead.setAttribute("cy", y);
-                bead.setAttribute("r", beadRadius); 
-                bead.setAttribute("class", "draggable-bead");
-                bead.setAttribute("data-index", index);
-                
-                bead.setAttribute("fill", getBeadColor(type));
-                bead.setAttribute("stroke", draggedBeadIndex === index ? "#d4af37" : "rgba(255,255,255,0.3)");
-                bead.setAttribute("stroke-width", draggedBeadIndex === index ? "2" : "1");
-                
-                bead.style.filter = "drop-shadow(2px 2px 2px rgba(0,0,0,0.3))";
-                bead.style.cursor = "grab";
-                
-                // 滑鼠拖拽事件
-                bead.addEventListener('mousedown', (e) => {
-                    draggedBeadIndex = index;
-                    bead.style.cursor = "grabbing";
-                    e.stopPropagation();
+    const artTypes = {
+        planet(c, uid) {
+            const r = 50, cx = 100, cy = 100;
+            let surfHTML = '';
+            if (c.bands) {
+                c.bands.forEach(b => {
+                    surfHTML += `<rect x="${cx-r}" y="${(b.y-b.h*0.5).toFixed(1)}" width="${r*2}" height="${b.h}" fill="${b.col}" opacity="${b.op}"/>`;
                 });
+            }
+            if (c.craters) {
+                for (let i = 0; i < c.craters; i++) {
+                    const bx = (cx - 33 + _r(uid+i*7+1)*66).toFixed(1);
+                    const by = (cy - 33 + _r(uid+i*7+2)*66).toFixed(1);
+                    const br = (2.2 + _r(uid+i*7+3)*5.5).toFixed(1);
+                    surfHTML += `<circle cx="${bx}" cy="${by}" r="${br}" fill="${c.dark}" opacity="0.28"/>`;
+                    surfHTML += `<circle cx="${bx}" cy="${by}" r="${br}" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/>`;
+                }
+            }
+            return `<defs>
+                <radialGradient id="pg${uid}" cx="33%" cy="28%" r="72%">
+                    <stop offset="0%"   stop-color="${c.highlight}"/>
+                    <stop offset="26%"  stop-color="${c.mid}"/>
+                    <stop offset="68%"  stop-color="${c.shadow}"/>
+                    <stop offset="100%" stop-color="${c.dark}"/>
+                </radialGradient>
+                <radialGradient id="pt${uid}" cx="76%" cy="76%" r="60%">
+                    <stop offset="0%"   stop-color="${c.dark}" stop-opacity="0.92"/>
+                    <stop offset="52%"  stop-color="${c.dark}" stop-opacity="0.28"/>
+                    <stop offset="100%" stop-color="${c.dark}" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="pa${uid}" cx="50%" cy="50%" r="50%">
+                    <stop offset="72%"  stop-color="${c.atmos||c.glow}" stop-opacity="0"/>
+                    <stop offset="100%" stop-color="${c.atmos||c.glow}" stop-opacity="0.62"/>
+                </radialGradient>
+                <clipPath id="pc${uid}"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath>
+                <filter id="gf${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="13"/></filter>
+                <filter id="sf${uid}" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="2.8"/></filter>
+            </defs>
+            <circle cx="${cx}" cy="${cy+9}" r="58" fill="${c.glow}" filter="url(#gf${uid})" opacity="0.28"/>
+            <g clip-path="url(#pc${uid})">
+                <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#pg${uid})"/>
+                ${surfHTML}
+                <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#pt${uid})"/>
+            </g>
+            <circle cx="${cx}" cy="${cy}" r="${r+1}" fill="url(#pa${uid})"/>
+            <ellipse cx="${cx-17}" cy="${cy-20}" rx="11" ry="6" fill="white" opacity="0.14" filter="url(#sf${uid})"/>`;
+        },
 
-                beadsGroup.appendChild(bead);
+        ringed(c, uid) {
+            const r = 44, cx = 100, cy = 100, rc = cy + 5;
+            let surfHTML = '';
+            if (c.bands) {
+                c.bands.forEach(b => {
+                    surfHTML += `<rect x="${cx-r}" y="${(b.y-b.h*0.5).toFixed(1)}" width="${r*2}" height="${b.h}" fill="${b.col}" opacity="${b.op}"/>`;
+                });
+            }
+            return `<defs>
+                <radialGradient id="pg${uid}" cx="33%" cy="28%" r="72%">
+                    <stop offset="0%"   stop-color="${c.highlight}"/>
+                    <stop offset="26%"  stop-color="${c.mid}"/>
+                    <stop offset="68%"  stop-color="${c.shadow}"/>
+                    <stop offset="100%" stop-color="${c.dark}"/>
+                </radialGradient>
+                <radialGradient id="pt${uid}" cx="76%" cy="76%" r="60%">
+                    <stop offset="0%"   stop-color="${c.dark}" stop-opacity="0.92"/>
+                    <stop offset="52%"  stop-color="${c.dark}" stop-opacity="0.28"/>
+                    <stop offset="100%" stop-color="${c.dark}" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="pa${uid}" cx="50%" cy="50%" r="50%">
+                    <stop offset="72%"  stop-color="${c.atmos||c.glow}" stop-opacity="0"/>
+                    <stop offset="100%" stop-color="${c.atmos||c.glow}" stop-opacity="0.62"/>
+                </radialGradient>
+                <linearGradient id="rg${uid}" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%"   stop-color="${c.ring}"         stop-opacity="0.06"/>
+                    <stop offset="14%"  stop-color="${c.ring2||c.ring}" stop-opacity="0.62"/>
+                    <stop offset="30%"  stop-color="${c.ring}"         stop-opacity="0.85"/>
+                    <stop offset="50%"  stop-color="${c.ring2||c.ring}" stop-opacity="0.48"/>
+                    <stop offset="70%"  stop-color="${c.ring}"         stop-opacity="0.85"/>
+                    <stop offset="86%"  stop-color="${c.ring2||c.ring}" stop-opacity="0.62"/>
+                    <stop offset="100%" stop-color="${c.ring}"         stop-opacity="0.06"/>
+                </linearGradient>
+                <clipPath id="pc${uid}"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath>
+                <clipPath id="rb${uid}"><rect x="0" y="0" width="200" height="${cy}"/></clipPath>
+                <clipPath id="rf${uid}"><rect x="0" y="${cy}" width="200" height="200"/></clipPath>
+                <filter id="gf${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="12"/></filter>
+                <filter id="sf${uid}" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="2.8"/></filter>
+            </defs>
+            <circle cx="${cx}" cy="${cy+9}" r="56" fill="${c.glow}" filter="url(#gf${uid})" opacity="0.26"/>
+            <ellipse cx="${cx}" cy="${rc}" rx="85" ry="15" fill="url(#rg${uid})" clip-path="url(#rb${uid})" opacity="0.72"/>
+            <ellipse cx="${cx}" cy="${rc}" rx="70" ry="10" fill="url(#rg${uid})" clip-path="url(#rb${uid})" opacity="0.44"/>
+            <g clip-path="url(#pc${uid})">
+                <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#pg${uid})"/>
+                ${surfHTML}
+                <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#pt${uid})"/>
+            </g>
+            <circle cx="${cx}" cy="${cy}" r="${r+1}" fill="url(#pa${uid})"/>
+            <ellipse cx="${cx-14}" cy="${cy-17}" rx="9" ry="5" fill="white" opacity="0.13" filter="url(#sf${uid})"/>
+            <ellipse cx="${cx}" cy="${rc}" rx="85" ry="15" fill="url(#rg${uid})" clip-path="url(#rf${uid})" opacity="0.72"/>
+            <ellipse cx="${cx}" cy="${rc}" rx="70" ry="10" fill="url(#rg${uid})" clip-path="url(#rf${uid})" opacity="0.44"/>`;
+        },
+
+        sun(c, uid) {
+            let rays = '';
+            for (let i = 0; i < 18; i++) {
+                const a   = (i / 18) * Math.PI * 2;
+                const len = 58 + _r(uid + i) * 26;
+                const x1  = (100 + Math.cos(a) * 52).toFixed(1);
+                const y1  = (100 + Math.sin(a) * 52).toFixed(1);
+                const x2  = (100 + Math.cos(a) * len).toFixed(1);
+                const y2  = (100 + Math.sin(a) * len).toFixed(1);
+                const sw  = (0.8 + _r(uid + i + 50) * 2.5).toFixed(1);
+                const op  = (0.2 + _r(uid + i + 100) * 0.6).toFixed(2);
+                rays += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c.ray}" stroke-width="${sw}" opacity="${op}" stroke-linecap="round"/>`;
+            }
+            let proms = '';
+            for (let i = 0; i < 3; i++) {
+                const a  = (i / 3) * Math.PI * 2 + _r(uid + i * 99) * 1.5;
+                const p1x = (100 + Math.cos(a) * 52).toFixed(1);
+                const p1y = (100 + Math.sin(a) * 52).toFixed(1);
+                const p2x = (100 + Math.cos(a + 0.55) * 65).toFixed(1);
+                const p2y = (100 + Math.sin(a + 0.55) * 65).toFixed(1);
+                const p3x = (100 + Math.cos(a + 1.1) * 52).toFixed(1);
+                const p3y = (100 + Math.sin(a + 1.1) * 52).toFixed(1);
+                proms += `<path d="M${p1x} ${p1y} Q${p2x} ${p2y} ${p3x} ${p3y}" fill="none" stroke="${c.ray}" stroke-width="1.8" opacity="0.42" stroke-linecap="round"/>`;
+            }
+            return `<defs>
+                <radialGradient id="s${uid}" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stop-color="${c.core}"/>
+                    <stop offset="25%"  stop-color="${c.core}" stop-opacity="0.9"/>
+                    <stop offset="60%"  stop-color="${c.mid}"/>
+                    <stop offset="86%"  stop-color="${c.edge}"/>
+                    <stop offset="100%" stop-color="${c.edge}" stop-opacity="0.15"/>
+                </radialGradient>
+                <filter id="gf${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
+                <filter id="cf${uid}" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5"/></filter>
+            </defs>
+            <circle cx="100" cy="100" r="78" fill="${c.mid}" filter="url(#gf${uid})" opacity="0.3"/>
+            ${rays}
+            ${proms}
+            <circle cx="100" cy="100" r="51" fill="${c.mid}" filter="url(#cf${uid})" opacity="0.5"/>
+            <circle cx="100" cy="100" r="50" fill="url(#s${uid})"/>`;
+        },
+
+        moon(c, uid) {
+            const crPos = [[87,87,8],[110,113,6],[79,115,5],[117,89,4.2]];
+            let craters = crPos.map(([px,py,pr]) =>
+                `<circle cx="${px}" cy="${py}" r="${pr}" fill="${c.dark}" opacity="0.24"/>` +
+                `<circle cx="${px}" cy="${py}" r="${pr}" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/>`
+            ).join('');
+            return `<defs>
+                <radialGradient id="m${uid}" cx="41%" cy="33%" r="64%">
+                    <stop offset="0%"   stop-color="${c.light}"/>
+                    <stop offset="42%"  stop-color="${c.light}" stop-opacity="0.78"/>
+                    <stop offset="100%" stop-color="${c.dark}"/>
+                </radialGradient>
+                <radialGradient id="ma${uid}" cx="50%" cy="50%" r="50%">
+                    <stop offset="74%"  stop-color="${c.glow||c.light}" stop-opacity="0"/>
+                    <stop offset="100%" stop-color="${c.glow||c.light}" stop-opacity="0.48"/>
+                </radialGradient>
+                <mask id="mm${uid}">
+                    <rect width="200" height="200" fill="black"/>
+                    <circle cx="100" cy="100" r="52" fill="white"/>
+                    <circle cx="128" cy="87"  r="47" fill="black"/>
+                </mask>
+                <filter id="gf${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="11"/></filter>
+            </defs>
+            <circle cx="100" cy="108" r="60" fill="${c.glow||c.light}" filter="url(#gf${uid})" opacity="0.2"/>
+            <g mask="url(#mm${uid})">
+                <circle cx="100" cy="100" r="52" fill="url(#m${uid})"/>
+                ${craters}
+            </g>
+            <circle cx="100" cy="100" r="53" fill="url(#ma${uid})"/>`;
+        },
+
+        galaxy(c, uid) {
+            let arms = '';
+            for (let arm = 0; arm < 3; arm++) {
+                const off = (arm / 3) * Math.PI * 2;
+                let d = 'M 100 100';
+                for (let t = 1; t <= 32; t++) {
+                    const rr = t * 2.6;
+                    const a  = off + t * 0.27;
+                    d += ` L ${(100 + rr * Math.cos(a)).toFixed(1)} ${(100 + rr * Math.sin(a)).toFixed(1)}`;
+                }
+                arms += `<path d="${d}" fill="none" stroke="${c.arm}" stroke-width="3.5" opacity="0.48"/>`;
+                arms += `<path d="${d}" fill="none" stroke="${c.arm}" stroke-width="7"   opacity="0.12"/>`;
+            }
+            return `<defs>
+                <radialGradient id="gc${uid}" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stop-color="${c.core}"/>
+                    <stop offset="60%"  stop-color="${c.core}" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="${c.core}" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="gf${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter>
+            </defs>
+            <circle cx="100" cy="100" r="90" fill="${c.arm}" filter="url(#gf${uid})" opacity="0.08"/>
+            ${arms}
+            <circle cx="100" cy="100" r="14" fill="url(#gc${uid})" filter="url(#gf${uid})"/>
+            <circle cx="100" cy="100" r="8"  fill="${c.core}"/>`;
+        },
+
+        blackhole(c, uid) {
+            let disk = '';
+            for (let i = 0; i < 6; i++) {
+                disk += `<ellipse cx="100" cy="100" rx="${58 + i * 5}" ry="${9 + i * 5}" fill="none" stroke="${c.disk}" stroke-width="${4 - i * 0.45}" opacity="${(0.55 - i * 0.08).toFixed(2)}"/>`;
+            }
+            return `<defs>
+                <radialGradient id="bh${uid}" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stop-color="#000"/>
+                    <stop offset="68%"  stop-color="#000"/>
+                    <stop offset="100%" stop-color="${c.disk}" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="gf${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="12"/></filter>
+            </defs>
+            <circle cx="100" cy="100" r="82" fill="${c.disk}" filter="url(#gf${uid})" opacity="0.14"/>
+            ${disk}
+            <circle cx="100" cy="100" r="32" fill="url(#bh${uid})"/>
+            <circle cx="100" cy="100" r="20" fill="#000"/>`;
+        },
+
+        burst(c, uid) {
+            let lines = '';
+            for (let i = 0; i < 26; i++) {
+                const a   = (i / 26) * Math.PI * 2;
+                const len = 44 + _r(uid + i * 7) * 48;
+                const x2  = (100 + Math.cos(a) * len).toFixed(1);
+                const y2  = (100 + Math.sin(a) * len).toFixed(1);
+                lines += `<line x1="100" y1="100" x2="${x2}" y2="${y2}" stroke="${c.ray}" stroke-width="${(0.5 + _r(uid + i) * 2.2).toFixed(1)}" opacity="${(0.18 + _r(uid + i + 200) * 0.7).toFixed(2)}"/>`;
+            }
+            return `<defs>
+                <radialGradient id="br${uid}" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stop-color="${c.core}"/>
+                    <stop offset="38%"  stop-color="${c.mid}"/>
+                    <stop offset="100%" stop-color="${c.mid}" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="gf${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
+            </defs>
+            <circle cx="100" cy="100" r="82" fill="${c.mid}" filter="url(#gf${uid})" opacity="0.24"/>
+            ${lines}
+            <circle cx="100" cy="100" r="22" fill="url(#br${uid})"/>`;
+        },
+
+        comet(c, uid) {
+            return `<defs>
+                <filter id="gf${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter>
+            </defs>
+            <path d="M 42 42 Q 78 72 118 105" fill="none" stroke="${c.tail}" stroke-width="22" stroke-linecap="round" opacity="0.12"/>
+            <path d="M 46 40 Q 82 70 120 103" fill="none" stroke="${c.tail}" stroke-width="10" stroke-linecap="round" opacity="0.28"/>
+            <path d="M 50 38 Q 86 68 122 101" fill="none" stroke="${c.tail}" stroke-width="4"  stroke-linecap="round" opacity="0.55"/>
+            <circle cx="120" cy="104" r="22" fill="${c.core}" filter="url(#gf${uid})" opacity="0.45"/>
+            <circle cx="120" cy="104" r="13" fill="${c.core}"/>
+            <circle cx="116" cy="100" r="5"  fill="white" opacity="0.75"/>`;
+        },
+
+        binary(c, uid) {
+            return `<defs>
+                <radialGradient id="b1${uid}" cx="34%" cy="29%" r="68%">
+                    <stop offset="0%"   stop-color="${c.light1}"/>
+                    <stop offset="55%"  stop-color="${c.dark1}" stop-opacity="0.7"/>
+                    <stop offset="100%" stop-color="${c.dark1}"/>
+                </radialGradient>
+                <radialGradient id="b2${uid}" cx="34%" cy="29%" r="68%">
+                    <stop offset="0%"   stop-color="${c.light2}"/>
+                    <stop offset="55%"  stop-color="${c.dark2}" stop-opacity="0.7"/>
+                    <stop offset="100%" stop-color="${c.dark2}"/>
+                </radialGradient>
+                <filter id="gf${uid}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="10"/></filter>
+            </defs>
+            <circle cx="70"  cy="94"  r="42" fill="${c.glow1}" filter="url(#gf${uid})" opacity="0.28"/>
+            <circle cx="132" cy="108" r="34" fill="${c.glow2}" filter="url(#gf${uid})" opacity="0.22"/>
+            <ellipse cx="100" cy="100" rx="54" ry="6" fill="none" stroke="${c.orbit}" stroke-width="1" opacity="0.28" stroke-dasharray="4 4"/>
+            <circle cx="70"  cy="94"  r="36" fill="url(#b1${uid})"/>
+            <circle cx="132" cy="108" r="27" fill="url(#b2${uid})"/>`;
+        },
+    };
+
+    function makeCardSVG(card) {
+        const uid = card.id;
+        const st  = starField(uid, card.stars || 65, card.starCol || '#ffffff');
+        const art = artTypes[card.type](card.art, uid);
+        return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="bg${uid}" cx="50%" cy="40%" r="75%">
+                    <stop offset="0%"   stop-color="${card.bg[0]}"/>
+                    <stop offset="100%" stop-color="${card.bg[1]}"/>
+                </radialGradient>
+            </defs>
+            <rect width="200" height="200" fill="url(#bg${uid})"/>
+            ${st}${art}
+        </svg>`;
+    }
+
+    const TAROT = [
+        { id:  0, num: '0',    name: '愚者',   en: 'The Fool',
+          type: 'comet',     stars: 80, starCol: '#cce0ff', bg: ['#0c1028','#020510'],
+          art: { core: '#dff0ff', tail: '#8ec4f8' },
+          fortune: '今日充滿全新的可能性，保持輕盈的心態迎向未知。宇宙在引領你踏上一段嶄新的旅程，無需過多計算得失。放下顧慮，讓直覺領路，意想不到的驚喜正在前方等候。' },
+        { id:  1, num: 'Ⅰ',   name: '魔術師', en: 'The Magician',
+          type: 'burst',     stars: 55, starCol: '#ffe8a0', bg: ['#1a1000','#050300'],
+          art: { core: '#fffde0', mid: '#f5c842', ray: '#f5c842' },
+          fortune: '今日你具備將想法化為現實的一切能力。聚焦意念，行動起來，你的意志將如宇宙中心之力般強大。所有工具已齊備，此刻正是施展才能的最佳時機。' },
+        { id:  2, num: 'Ⅱ',   name: '女祭司', en: 'The High Priestess',
+          type: 'moon',      stars: 70, starCol: '#d0e8ff', bg: ['#050a1e','#010308'],
+          art: { light: '#e8f0ff', dark: '#6080b0', glow: '#8ab0e0' },
+          fortune: '內在智慧正悄聲引導你，靜心傾聽直覺的低語。今日不宜衝動決策，等待更多信息揭示後再行動。月光映照出隱藏的真相，耐心等待迷霧散去。' },
+        { id:  3, num: 'Ⅲ',   name: '皇后',   en: 'The Empress',
+          type: 'ringed',    stars: 60, starCol: '#c8f0e0', bg: ['#001510','#000805'],
+          art: { highlight: '#c8ffe0', mid: '#28c870', shadow: '#008050', dark: '#002818', atmos: '#60d898', glow: '#50c890', ring: '#90ffc8', ring2: '#38a870', bands: [{y:96,h:6,col:'#18a858',op:0.38},{y:108,h:5,col:'#40d080',op:0.3}] },
+          fortune: '豐盛與創造力充盈今日，萬物生機盎然。用心感受生活中的美好，小確幸正是最大的財富。付出關愛與善意，它將以豐厚的形式回報於你。' },
+        { id:  4, num: 'Ⅳ',   name: '皇帝',   en: 'The Emperor',
+          type: 'planet',    stars: 50, starCol: '#ffd8b0', bg: ['#1a0800','#060200'],
+          art: { highlight: '#ffe0a0', mid: '#d07840', shadow: '#8c3010', dark: '#3a0e00', atmos: '#f0a060', glow: '#e07030', bands: [{y:88,h:6,col:'#c06020',op:0.45},{y:100,h:8,col:'#8a3810',op:0.38},{y:112,h:5,col:'#d08040',op:0.32}] },
+          fortune: '今日宜以穩定的步伐掌控局面，建立清晰的秩序。你的判斷力與領導力是最強大的依靠，堅守原則。所建立的一切將成為持久的基石，地位穩固不可撼動。' },
+        { id:  5, num: 'Ⅴ',   name: '教皇',   en: 'The Hierophant',
+          type: 'ringed',    stars: 55, starCol: '#f0e8c0', bg: ['#12100a','#040300'],
+          art: { highlight: '#fff8d8', mid: '#e0b040', shadow: '#8c6000', dark: '#3a2400', atmos: '#e8c060', glow: '#d4a030', ring: '#f0d880', ring2: '#b08820', bands: [{y:93,h:5,col:'#c09030',op:0.42},{y:106,h:6,col:'#d8a840',op:0.32}] },
+          fortune: '傳統智慧為你指路，今日適合向前輩或良師請益。在規範與架構中尋找方向，循序漸進方能走得穩遠。知識的積累是今日最好的投資。' },
+        { id:  6, num: 'Ⅵ',   name: '戀人',   en: 'The Lovers',
+          type: 'binary',    stars: 75, starCol: '#ffd0f0', bg: ['#180818','#060206'],
+          art: { light1: '#ffc0e8', dark1: '#a03080', glow1: '#f080c0', light2: '#c0d8ff', dark2: '#3060c0', glow2: '#8090ff', orbit: '#d090e0' },
+          fortune: '今日的選擇攸關心靈深處的真實渴望，請誠實面對自己。無論是感情或事業，選擇與內心價值觀相符的道路。兩顆星辰的相遇，成就了最美麗的因緣。' },
+        { id:  7, num: 'Ⅶ',   name: '戰車',   en: 'The Chariot',
+          type: 'planet',    stars: 50, starCol: '#ffc0a0', bg: ['#180500','#060100'],
+          art: { highlight: '#ffb090', mid: '#c02c0c', shadow: '#801800', dark: '#400800', atmos: '#e05030', glow: '#e04020', craters: 5 },
+          fortune: '勝利近在眼前，保持意志力與高度專注。今日不可猶豫，果斷前行才能突破所有阻礙。宇宙的力量在背後推動著你，無可阻擋地向前衝刺。' },
+        { id:  8, num: 'Ⅷ',   name: '力量',   en: 'Strength',
+          type: 'sun',       stars: 45, starCol: '#fff0c8', bg: ['#180e00','#060400'],
+          art: { core: '#fffce0', mid: '#f0c040', edge: '#e08000', ray: '#f0c040' },
+          fortune: '真正的力量源自內心的平靜，而非外在的強硬。今日以溫柔征服困境，柔韌勝過剛強。你的耐心與慈悲心是今日最有力的盔甲。' },
+        { id:  9, num: 'Ⅸ',   name: '隱者',   en: 'The Hermit',
+          type: 'planet',    stars: 90, starCol: '#a0b8c8', bg: ['#050a10','#010305'],
+          art: { highlight: '#d8e8f0', mid: '#6080a8', shadow: '#304060', dark: '#101828', atmos: '#7090b8', glow: '#5070a0', craters: 7 },
+          fortune: '獨處與反思帶來深刻洞見，今日宜向內探尋。外在喧囂中尋一方寧靜，答案就在靜默之中。智慧之光雖微弱，已足以照亮你前行的道路。' },
+        { id: 10, num: 'Ⅹ',   name: '命運之輪', en: 'Wheel of Fortune',
+          type: 'galaxy',    stars: 80, starCol: '#d0b8ff', bg: ['#0a0520','#030108'],
+          art: { core: '#e0d0ff', arm: '#9060e0' },
+          fortune: '命運的轉輪旋轉不息，改變即將到來。今日接受生命的流動，順應轉變而非抗拒。好運正在積蓄中，時機一到將如漩渦般降臨。' },
+        { id: 11, num: 'Ⅺ',   name: '正義',   en: 'Justice',
+          type: 'binary',    stars: 60, starCol: '#d0e8ff', bg: ['#050e18','#010406'],
+          art: { light1: '#e0f0ff', dark1: '#3068a8', glow1: '#70a8e8', light2: '#fff8e0', dark2: '#c09020', glow2: '#e8c840', orbit: '#a0c0e0' },
+          fortune: '因果法則清晰運作，公平將主宰今日一切。誠實與正直是最好的武器，做出符合良知的決定。宇宙天秤正趨向平衡，你將得到應得的回報。' },
+        { id: 12, num: 'Ⅻ',   name: '倒吊人', en: 'The Hanged Man',
+          type: 'galaxy',    stars: 65, starCol: '#b0d8ff', bg: ['#020810','#000204'],
+          art: { core: '#80c0ff', arm: '#4090c0' },
+          fortune: '暫時的停頓帶來全新的視角，放慢腳步才能看清全貌。今日不宜強求，主動放下反而帶來解脫。換個角度看待世界，意想不到的啟發即將降臨。' },
+        { id: 13, num: 'ⅩⅢ',  name: '死神',   en: 'Death',
+          type: 'blackhole', stars: 70, starCol: '#8080a0', bg: ['#020206','#000002'],
+          art: { disk: '#8060c0' },
+          fortune: '舊事物的終結為嶄新生命騰出空間。今日宜放下不再服務於你的一切人事物，這是蛻變的訊號而非終點。黑暗的彼端，一道曙光正在升起。' },
+        { id: 14, num: 'ⅩⅣ',  name: '節制',   en: 'Temperance',
+          type: 'planet',    stars: 65, starCol: '#b0e0ff', bg: ['#001020','#000608'],
+          art: { highlight: '#b0eaff', mid: '#1c90d0', shadow: '#0050a0', dark: '#001848', atmos: '#50b8e8', glow: '#40b0e8', bands: [{y:95,h:7,col:'#1070b0',op:0.38},{y:108,h:5,col:'#40a0d0',op:0.28}] },
+          fortune: '平衡與節制是今日的核心主題，過猶不及皆非善事。將不同的元素融合調和，創造出和諧的整體。宇宙的流動引導你找到完美的平衡點。' },
+        { id: 15, num: 'ⅩⅤ',  name: '惡魔',   en: 'The Devil',
+          type: 'planet',    stars: 45, starCol: '#a06060', bg: ['#100005','#040001'],
+          art: { highlight: '#e05048', mid: '#8c1c1c', shadow: '#500808', dark: '#200004', atmos: '#c02828', glow: '#a02030' },
+          fortune: '審視那些束縛你的想法與習慣，你遠比你想像中更加自由。今日的挑戰是誠實面對並認清自身的陰影。當你選擇看清真相，枷鎖自然鬆脫消散。' },
+        { id: 16, num: 'ⅩⅥ',  name: '塔',     en: 'The Tower',
+          type: 'burst',     stars: 55, starCol: '#ffc090', bg: ['#150800','#050200'],
+          art: { core: '#fff0c0', mid: '#f06010', ray: '#f08020' },
+          fortune: '舊有結構的崩塌雖然震撼，卻為更真實的重建清場。今日可能有意外的揭露或急遽的變化，保持彈性應對。廢墟之上，更堅實的根基正待重新建立。' },
+        { id: 17, num: 'ⅩⅦ',  name: '星星',   en: 'The Star',
+          type: 'burst',     stars: 88, starCol: '#c0e8ff', bg: ['#020a18','#000408'],
+          art: { core: '#e8f8ff', mid: '#60c0ff', ray: '#80d0ff' },
+          fortune: '黑暗過後是星光，希望的光芒永遠不曾熄滅。今日保持信念，宇宙的祝福正如星雨般向你湧來。敞開心胸接受療癒，你的夢想並不遙遠。' },
+        { id: 18, num: 'ⅩⅧ',  name: '月亮',   en: 'The Moon',
+          type: 'moon',      stars: 78, starCol: '#c8d8f0', bg: ['#040810','#010305'],
+          art: { light: '#f0f4ff', dark: '#8090c0', glow: '#a0b0e8' },
+          fortune: '直覺與夢境帶來重要訊息，今日留意潛意識的信號。事情可能存在隱藏的面向，不要急於下定論。月光終將映照出真相，耐心等待迷霧自然散去。' },
+        { id: 19, num: 'ⅩⅨ',  name: '太陽',   en: 'The Sun',
+          type: 'sun',       stars: 30, starCol: '#ffe8a0', bg: ['#200e00','#080400'],
+          art: { core: '#ffffff', mid: '#ffdd40', edge: '#ff9900', ray: '#ffcc20' },
+          fortune: '光明與活力充盈今日，一切都清晰可見、充滿喜悅。你的才能與熱情將帶來成功與豐收。今日是為靈魂充電的絕佳時機，讓陽光填滿你所有的角落。' },
+        { id: 20, num: 'ⅩⅩ',  name: '審判',   en: 'Judgement',
+          type: 'burst',     stars: 60, starCol: '#e8e8ff', bg: ['#050510','#010104'],
+          art: { core: '#ffffff', mid: '#d0d8ff', ray: '#c0c8ff' },
+          fortune: '一個重要的覺醒時刻正在到來，你被召喚走向更高的自己。傾聽內心深處的呼喚，做出能讓靈魂真正舒展的選擇。蛻變的鐘聲響起，準備好迎接全新的你。' },
+        { id: 21, num: 'ⅩⅪ',  name: '世界',   en: 'The World',
+          type: 'ringed',    stars: 60, starCol: '#c0e8ff', bg: ['#001018','#000408'],
+          art: { highlight: '#90e8ff', mid: '#1878d8', shadow: '#003888', dark: '#000c30', atmos: '#50c0f8', glow: '#40a0e0', ring: '#80e8ff', ring2: '#2090d0' },
+          fortune: '一個重要的生命循環正圓滿完成，值得好好慶祝。今日感恩走過的旅程，你已抵達了一個嶄新的高峰。整個宇宙與你同頻共振，完整與圓滿已在你心中。' },
+    ];
+
+    function drawCard() {
+        const btn     = document.getElementById('tarot-btn');
+        const reveal  = document.getElementById('tarot-reveal');
+        const flipCard = document.getElementById('flip-card');
+        const front   = document.getElementById('flip-front');
+        const fortune = document.getElementById('fortune-text');
+
+        // Daily card: deterministic by date
+        const d   = new Date();
+        const key = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+        const card = TAROT[key % 22];
+
+        // Reset state
+        flipCard.classList.remove('flipped');
+        fortune.classList.remove('show');
+        fortune.textContent = '';
+
+        // Build front face
+        front.innerHTML = `
+            <div class="card-num">${card.num}</div>
+            <div class="card-art-wrap">${makeCardSVG(card)}</div>
+            <div class="card-name-plate">
+                <div class="card-name-zh">${card.name}</div>
+                <div class="card-name-en">${card.en}</div>
+            </div>`;
+
+        // Show reveal, hide button
+        reveal.style.display = 'flex';
+        btn.style.display = 'none';
+
+        // Face-down for 0.9s, then flip
+        setTimeout(() => {
+            flipCard.classList.add('flipped');
+            setTimeout(() => {
+                fortune.textContent = card.fortune;
+                fortune.classList.add('show');
+            }, 650);
+        }, 900);
+    }
+
+    // ─── Divination animation ───
+    function startDivination() {
+        const overlay = document.getElementById('div-overlay');
+        const scene   = document.getElementById('cb-scene');
+        const aurora1 = document.getElementById('cb-aurora1');
+        const aurora2 = document.getElementById('cb-aurora2');
+        const iglow   = document.getElementById('cb-iglow');
+        const otext   = document.getElementById('oracle-text');
+        const flash   = document.getElementById('screen-flash');
+        const canvas  = document.getElementById('anim-canvas');
+
+        // Reset
+        scene.classList.remove('appear');
+        aurora1.classList.remove('on');
+        aurora2.classList.remove('on');
+        iglow.classList.remove('bright');
+        otext.classList.remove('visible');
+        flash.classList.remove('flash');
+
+        // Setup canvas
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Visual center aligned with ball
+        const CX = canvas.width  / 2;
+        const CY = canvas.height / 2 - 42;
+        const BR = 110;
+
+        let particles = [];
+        let rings     = [];
+        let animTime  = 0;
+        let running   = true;
+        let rafId;
+
+        // Three orbit rings: purple inner, gold mid, cyan outer
+        const ORB_CFG = [
+            { count: 3, r: 130, spd:  0.010, sz: 4.5, col: [168, 130, 255] },
+            { count: 5, r: 165, spd: -0.007, sz: 3.0, col: [255, 212,  75] },
+            { count: 8, r: 200, spd:  0.004, sz: 2.0, col: [ 75, 210, 255] },
+        ];
+        const orbiters = [];
+        ORB_CFG.forEach(cfg => {
+            for (let i = 0; i < cfg.count; i++) {
+                orbiters.push({
+                    a: (i / cfg.count) * Math.PI * 2,
+                    r: cfg.r, spd: cfg.spd, sz: cfg.sz,
+                    col: cfg.col, alpha: 0
+                });
+            }
+        });
+
+        function spawnSparkle() {
+            const ang = Math.random() * Math.PI * 2;
+            const rad = BR * (0.2 + Math.random() * 0.8);
+            particles.push({
+                x:    CX + Math.cos(ang) * rad,
+                y:    CY + Math.sin(ang) * rad,
+                vx:   (Math.random() - 0.5) * 0.55,
+                vy:   -(0.3 + Math.random() * 1.7),
+                sz:   0.8 + Math.random() * 3.0,
+                life: 1,
+                dec:  0.007 + Math.random() * 0.010,
+                col:  Math.random() > 0.45 ? [255, 215, 88] : [200, 170, 255],
             });
         }
 
-        // SVG 全局滑鼠事件處理拖拽
-        braceletSvg.addEventListener('mousemove', (e) => {
-            if (draggedBeadIndex === null) return;
-
-            // 取得 SVG 的座標系並轉換至 SVG 的 viewBox 比例 (0 到 300)
-            const rect = braceletSvg.getBoundingClientRect();
-            const svgX = (e.clientX - rect.left) * (300 / rect.width);
-            const svgY = (e.clientY - rect.top) * (300 / rect.height);
-            
-            // 計算相對於中心點 (150, 150) 的偏移量
-            const dx = svgX - 150;
-            const dy = svgY - 150;
-
-            // 計算弧度角度
-            let angle = Math.atan2(dy, dx);
-            if (angle < 0) angle += 2 * Math.PI;
-
-            // 更新被拖拽珠子的角度
-            selectedBeads[draggedBeadIndex].angle = angle;
-            updateBracelet();
-        });
-
-        window.addEventListener('mouseup', () => {
-            if (draggedBeadIndex !== null) {
-                draggedBeadIndex = null;
-                updateBracelet();
-            }
-        });
-
-        // 支援觸控裝置
-        braceletSvg.addEventListener('touchmove', (e) => {
-            if (draggedBeadIndex === null) return;
-            const touch = e.touches[0];
-            const rect = braceletSvg.getBoundingClientRect();
-            const svgX = (touch.clientX - rect.left) * (300 / rect.width);
-            const svgY = (touch.clientY - rect.top) * (300 / rect.height);
-            
-            const dx = svgX - 150;
-            const dy = svgY - 150;
-
-            let angle = Math.atan2(dy, dx);
-            if (angle < 0) angle += 2 * Math.PI;
-
-            selectedBeads[draggedBeadIndex].angle = angle;
-            updateBracelet();
-            e.preventDefault();
-        }, { passive: false });
-
-        window.addEventListener('touchend', () => {
-            if (draggedBeadIndex !== null) {
-                draggedBeadIndex = null;
-                updateBracelet();
-            }
-        });
-
-        function getBeadColor(type) {
-            const colors = {
-                amethyst: "#6c5ce7",
-                citrine: "#fdcb6e",
-                aquamarine: "#00cec9",
-                tourmaline: "#ff7675",
-                garnet: "#8b0000"
-            };
-            return colors[type] || "#cccccc";
+        function spawnRing(r0, endR, col) {
+            rings.push({ r: r0, end: endR, life: 1.0, col });
         }
 
-        function toggleSubmenu(id) {
-            const submenu = document.getElementById(id);
-            submenu.classList.toggle('active');
-            const btn = submenu.previousElementSibling;
-            const span = btn.querySelector('span');
-            if (submenu.classList.contains('active')) {
-                span.style.transform = 'rotate(180deg)';
-                span.style.display = 'inline-block';
-            } else {
-                span.style.transform = 'rotate(0deg)';
+        function loop() {
+            if (!running) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            animTime++;
+
+            const prog   = Math.min(animTime / 252, 1);
+            const climax = Math.max(0, (prog - 0.80) / 0.20);
+
+            // Orbiter alpha fade-in & rotation
+            const orbFade = Math.min(1, Math.max(0, (prog - 0.10) / 0.28));
+            orbiters.forEach(o => {
+                o.a    += o.spd * (1 + climax * 2.5);
+                o.alpha = orbFade * (0.58 + climax * 0.42);
+            });
+
+            // Sparkle rate increases near climax
+            const sparkEvery = climax > 0.2 ? 1 : prog > 0.12 ? 2 : 9999;
+            if (animTime % sparkEvery === 0) spawnSparkle();
+
+            // Timed energy rings
+            if (animTime === 52)  spawnRing(8, BR * 2.3, [140, 100, 255]);
+            if (animTime === 118) spawnRing(8, BR * 3.0, [100, 180, 255]);
+            if (animTime === 182) spawnRing(8, BR * 2.6, [255, 200,  80]);
+            if (animTime === 228) spawnRing(8, BR * 3.6, [255, 255, 255]);
+
+            // Draw rings
+            rings.forEach(ring => {
+                ring.r    += (ring.end - ring.r) * 0.028;
+                ring.life -= 0.009;
+                if (ring.life > 0) {
+                    const [rr, gg, bb] = ring.col;
+                    ctx.beginPath();
+                    ctx.arc(CX, CY, ring.r, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(${rr},${gg},${bb},${ring.life * 0.42})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            });
+            rings = rings.filter(r => r.life > 0);
+
+            // Draw orbit particles
+            orbiters.forEach(o => {
+                const x = CX + Math.cos(o.a) * o.r;
+                const y = CY + Math.sin(o.a) * o.r;
+                const [rr, gg, bb] = o.col;
+                const a = o.alpha;
+
+                // Glow halo
+                const grd = ctx.createRadialGradient(x, y, 0, x, y, o.sz * 5.5);
+                grd.addColorStop(0, `rgba(${rr},${gg},${bb},${a * 0.62})`);
+                grd.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+                ctx.beginPath();
+                ctx.arc(x, y, o.sz * 5.5, 0, Math.PI * 2);
+                ctx.fillStyle = grd;
+                ctx.fill();
+
+                // Core dot
+                ctx.beginPath();
+                ctx.arc(x, y, o.sz, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${rr},${gg},${bb},${a})`;
+                ctx.fill();
+
+                // Trailing comet tail at climax
+                if (climax > 0.15) {
+                    for (let t = 1; t <= 4; t++) {
+                        const ta = o.a - o.spd * t * 5;
+                        const tx = CX + Math.cos(ta) * o.r;
+                        const ty = CY + Math.sin(ta) * o.r;
+                        const ts = Math.max(0, o.sz * (1 - t * 0.22));
+                        ctx.beginPath();
+                        ctx.arc(tx, ty, ts, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${rr},${gg},${bb},${a * (1 - t * 0.22) * climax * 0.75})`;
+                        ctx.fill();
+                    }
+                }
+            });
+
+            // Draw sparkles
+            particles.forEach(p => {
+                p.x   += p.vx;
+                p.y   += p.vy;
+                p.vy  *= 0.988;
+                p.life -= p.dec;
+                if (p.life > 0) {
+                    const [rr, gg, bb] = p.col;
+                    const s = p.sz * p.life;
+                    if (p.sz > 2.0) {
+                        // Diamond shape for larger sparkles
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(Math.PI / 4);
+                        ctx.fillStyle = `rgba(${rr},${gg},${bb},${p.life * 0.88})`;
+                        ctx.fillRect(-s * 0.5, -s * 0.5, s, s);
+                        ctx.restore();
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, s, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${rr},${gg},${bb},${p.life * 0.78})`;
+                        ctx.fill();
+                    }
+                }
+            });
+            particles = particles.filter(p => p.life > 0);
+
+            // Climax radial burst
+            if (climax > 0) {
+                const grd = ctx.createRadialGradient(CX, CY, 0, CX, CY, BR * 3.5);
+                grd.addColorStop(0,   `rgba(255,240,175,${climax * 0.32})`);
+                grd.addColorStop(0.4, `rgba(201,162, 39,${climax * 0.10})`);
+                grd.addColorStop(1,   `rgba(255,255,255,0)`);
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
+
+            if (animTime < 262) rafId = requestAnimationFrame(loop);
         }
 
-        // 收放側邊欄功能
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('collapsed');
-            
-            const toggleBtn = document.querySelector('.toggle-sidebar-btn');
-            if (sidebar.classList.contains('collapsed')) {
-                toggleBtn.innerHTML = '☰';
-            } else {
-                toggleBtn.innerHTML = '✕';
-            }
-        }
-    </script>
+        // ── Launch sequence ──
+        overlay.style.display = 'flex';
+        void overlay.offsetWidth;
+        overlay.classList.add('show');
+
+        setTimeout(() => scene.classList.add('appear'),  150);
+        setTimeout(() => {
+            aurora1.classList.add('on');
+            aurora2.classList.add('on');
+            rafId = requestAnimationFrame(loop);
+        }, 460);
+        setTimeout(() => otext.classList.add('visible'), 1450);
+        setTimeout(() => iglow.classList.add('bright'),  1950);
+        setTimeout(() => flash.classList.add('flash'),   3960);
+
+        setTimeout(() => {
+            running = false;
+            cancelAnimationFrame(rafId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            showPage('divination');
+            overlay.classList.remove('show');
+            aurora1.classList.remove('on');
+            aurora2.classList.remove('on');
+            iglow.classList.remove('bright');
+            otext.classList.remove('visible');
+            flash.classList.remove('flash');
+            scene.classList.remove('appear');
+
+            setTimeout(() => { overlay.style.display = 'none'; }, 660);
+        }, 4260);
+    }
+</script>
 </body>
 </html>
