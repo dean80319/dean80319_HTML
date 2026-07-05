@@ -20,7 +20,14 @@
 - **手動拖曳**：按住珠子沿圓周自由調整位置
 - **智慧插入**：「最大空隙演算法」自動找最寬位置插入新珠子
 - **均勻排列**：一鍵等距分配所有珠子
-- **珠子樣式**：SVG `radialGradient` 填充，模擬礦石光澤（紫水晶、玫瑰石英等）
+- **移除珠子**：右鍵或雙擊移除（`hasDragged` flag 防止 SVG 重建破壞 dblclick）
+- **物理尺寸限制**：`getUsedMm()` 累加所有珠子 mm，防止超過手圍
+- **重疊偵測**：重疊珠子標紅框提示
+- **復原 / 儲存圖片**：undo 堆疊，Canvas 轉 PNG 下載
+- **銀珠**：`radialGradient` 銀色金屬光澤，固定選任意 mm
+- **星星 / 愛心銀飾吊飾**：固定 10mm，`<path>` 渲染（非圓形）
+  - SVG：動態 `radialGradient`（`gradientUnits="userSpaceOnUse"`，`fx`/`fy` 焦點偏左上）+ `clipPath` 裁切鏡面橢圓，產生立體球面感
+  - CSS 選色器：`radial-gradient(circle at 35% 30%)` + `clip-path` 裁切成星星/愛心形狀
 
 ### 占卜功能
 左側選單點「🔮 占卜」觸發：
@@ -90,10 +97,8 @@ select option { background: #141b2e; color: rgba(255,255,255,0.9); }
 
 ## 檔案狀態（2026/07/05 更新）
 
-本地端與 GitHub 目前完全同步，皆為 commit `5870c3d`。
-
-- `index.html` — 正式版，與 `index_new.html` 內容完全一致
-- `index_new.html` — 同上（開發過程中的暫存檔，已合併完成）
+- `index.html` — 正式版（單一主檔）
+- `backup/index_new.html` — 備份，內容與合併前相同
 
 ---
 
@@ -122,3 +127,4 @@ select option { background: #141b2e; color: rgba(255,255,255,0.9); }
 | 2026/06/27 | 占卜功能：水晶球動畫、轉場效果（原 index.html） |
 | 2026/06/29 | 全站重設計：glassmorphism UI、Canvas 占卜動畫、每日塔羅牌、寫實星球 SVG、覆蓋至 index.html 並推送 GitHub |
 | 2026/07/05 | 合併 index_new.html UI 改進至 index.html：Noto Sans TC、RWD 行動版、Active nav、閃爍星星、Select 修正、塔羅牌重置邏輯；本地與 GitHub 完全同步（commit 5870c3d） |
+| 2026/07/05 | 手鍊 DIY 大幅升級：銀珠、移除珠子、物理尺寸限制（混合尺寸）、重疊偵測、復原、儲存圖片；新增星星／愛心銀飾吊飾（固定 10mm，SVG `<path>` 動態焦點漸層 + clipPath 立體感） |

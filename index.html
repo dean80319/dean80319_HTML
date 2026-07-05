@@ -479,6 +479,23 @@
         .sph-aquamarine { background: radial-gradient(circle at 35% 30%, #a5f3fc, #06b6d4 50%, #164e63); --glow: rgba(6,182,212,0.4);  }
         .sph-tourmaline { background: radial-gradient(circle at 35% 30%, #fda4af, #f43f5e 35%, #6d28d9); --glow: rgba(244,63,94,0.3);  }
         .sph-garnet     { background: radial-gradient(circle at 35% 30%, #fca5a5, #dc2626 50%, #7f1d1d); --glow: rgba(220,38,38,0.4);  }
+        .sph-silver     { background: radial-gradient(circle at 35% 30%, #ffffff, #e0e4ec 18%, #a0a8b8 42%, #505868 70%, #1c2030); --glow: rgba(180,190,215,0.45); }
+        .sph-star-silver {
+            background: radial-gradient(circle at 35% 30%, #ffffff, #e0e4ec 18%, #a0a8b8 42%, #505868 70%, #1c2030);
+            border-radius: 0 !important;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            --glow: rgba(180,190,215,0.45);
+            box-shadow: none !important;
+        }
+        .sph-star-silver::after { display: none; }
+        .sph-heart-silver {
+            background: radial-gradient(circle at 35% 30%, #ffffff, #e0e4ec 18%, #a0a8b8 42%, #505868 70%, #1c2030);
+            border-radius: 0 !important;
+            clip-path: path('M 21 38 C 13.5 30.5, 6 30.5, 6 23 C 6 12.5, 19.5 12.5, 21 19.25 C 22.5 12.5, 36 12.5, 36 23 C 36 30.5, 28.5 30.5, 21 38 Z');
+            --glow: rgba(180,190,215,0.45);
+            box-shadow: none !important;
+        }
+        .sph-heart-silver::after { display: none; }
 
         .svg-wrap {
             background: rgba(0,0,0,0.28);
@@ -534,6 +551,20 @@
             font-size: 0.72rem;
             color: var(--dim);
             margin-top: 7px;
+        }
+
+        .bead-count {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--dim);
+            margin: 4px 0 6px;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+
+        .btn:disabled {
+            opacity: 0.32;
+            cursor: not-allowed;
         }
 
         /* ═══════════════════════════════════════════
@@ -1094,7 +1125,23 @@
                         <div class="c-sphere sph-garnet"></div>
                         <span class="c-name">石榴石</span>
                     </div>
+                    <div class="c-opt" onclick="addBead('silver')"
+                         role="button" tabindex="0" aria-label="加入銀珠">
+                        <div class="c-sphere sph-silver"></div>
+                        <span class="c-name">銀珠</span>
+                    </div>
+                    <div class="c-opt" onclick="addBead('star-silver')"
+                         role="button" tabindex="0" aria-label="加入星星銀飾">
+                        <div class="c-sphere sph-star-silver"></div>
+                        <span class="c-name">星星</span>
+                    </div>
+                    <div class="c-opt" onclick="addBead('heart-silver')"
+                         role="button" tabindex="0" aria-label="加入愛心銀飾">
+                        <div class="c-sphere sph-heart-silver"></div>
+                        <span class="c-name">愛心</span>
+                    </div>
                 </div>
+                <p class="bead-count" id="bead-count">0 / 23 顆</p>
 
                 <div class="svg-wrap">
                     <svg id="bracelet-svg" viewBox="0 0 300 300" aria-label="手鍊設計畫布">
@@ -1124,6 +1171,34 @@
                                 <stop offset="50%"  stop-color="#dc2626"/>
                                 <stop offset="100%" stop-color="#450a0a"/>
                             </radialGradient>
+                            <radialGradient id="g-silver" cx="35%" cy="30%" r="65%">
+                                <stop offset="0%"   stop-color="#ffffff"/>
+                                <stop offset="18%"  stop-color="#e0e4ec"/>
+                                <stop offset="42%"  stop-color="#a0a8b8"/>
+                                <stop offset="70%"  stop-color="#505868"/>
+                                <stop offset="100%" stop-color="#1c2030"/>
+                            </radialGradient>
+                            <linearGradient id="g-charm-silver" x1="25%" y1="10%" x2="75%" y2="90%">
+                                <stop offset="0%"   stop-color="#ffffff"/>
+                                <stop offset="20%"  stop-color="#e0e4ee"/>
+                                <stop offset="48%"  stop-color="#a0a8bc"/>
+                                <stop offset="75%"  stop-color="#505870"/>
+                                <stop offset="100%" stop-color="#1c2030"/>
+                            </linearGradient>
+                            <linearGradient id="g-star-silver" x1="25%" y1="10%" x2="75%" y2="90%">
+                                <stop offset="0%"   stop-color="#ffffff"/>
+                                <stop offset="20%"  stop-color="#e0e4ee"/>
+                                <stop offset="48%"  stop-color="#a0a8bc"/>
+                                <stop offset="75%"  stop-color="#505870"/>
+                                <stop offset="100%" stop-color="#1c2030"/>
+                            </linearGradient>
+                            <linearGradient id="g-heart-silver" x1="25%" y1="10%" x2="75%" y2="90%">
+                                <stop offset="0%"   stop-color="#ffffff"/>
+                                <stop offset="20%"  stop-color="#e0e4ee"/>
+                                <stop offset="48%"  stop-color="#a0a8bc"/>
+                                <stop offset="75%"  stop-color="#505870"/>
+                                <stop offset="100%" stop-color="#1c2030"/>
+                            </linearGradient>
                             <filter id="ring-glow" x="-20%" y="-20%" width="140%" height="140%">
                                 <feGaussianBlur stdDeviation="2.5" result="blur"/>
                                 <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -1151,9 +1226,11 @@
 
                 <div class="btn-row">
                     <button class="btn btn-gold" onclick="distributeEvenly()">均勻排列</button>
+                    <button class="btn btn-gold" id="btn-undo" onclick="undoLast()" disabled>復原</button>
+                    <button class="btn btn-gold" onclick="saveDesign()">儲存圖片</button>
                     <button class="btn btn-red"  onclick="clearBeads()">重置</button>
                 </div>
-                <p class="hint">點擊水晶加入手鍊 &middot; 按住珠子可拖曳調整位置</p>
+                <p class="hint">點擊加入 · 按住拖曳 · 右鍵／雙擊移除</p>
             </div>
         </div>
 
@@ -1263,6 +1340,8 @@
     // ─── Bracelet Designer ───
     let selectedBeads    = [];
     let draggedBeadIndex = null;
+    let beadHistory      = [];
+    let hasDragged       = false;
 
     const sizeInput     = document.getElementById('bracelet-size');
     const sizeValSpan   = document.getElementById('size-val');
@@ -1276,6 +1355,23 @@
         sizeValSpan.textContent = sizeInput.value;
         updateBracelet();
     });
+
+    beadSizeInput.addEventListener('change', () => { updateBracelet(); });
+
+    function getCircMm()  { return parseFloat(sizeInput.value) * 10; }
+    function getUsedMm()  { return selectedBeads.reduce((s, b) => s + b.size, 0); }
+    function canAddBead(size) { return getUsedMm() + size <= getCircMm(); }
+
+    function saveHistory() {
+        beadHistory.push(JSON.stringify(selectedBeads));
+        if (beadHistory.length > 30) beadHistory.shift();
+        updateUndoBtn();
+    }
+
+    function updateUndoBtn() {
+        const btn = document.getElementById('btn-undo');
+        if (btn) btn.disabled = beadHistory.length === 0;
+    }
 
     function getNextBeadAngle() {
         if (selectedBeads.length === 0) return 0;
@@ -1296,25 +1392,88 @@
         return insertAngle;
     }
 
+    const CHARM_TYPES = new Set(['star-silver', 'heart-silver']);
+
     function addBead(type) {
-        if (selectedBeads.length >= 24) return;
-        const size = parseFloat(beadSizeInput.value) || 6;
+        const size = CHARM_TYPES.has(type) ? 10 : (parseFloat(beadSizeInput.value) || 6);
+        if (!canAddBead(size)) return;
+        saveHistory();
         selectedBeads.push({ type, size, angle: getNextBeadAngle() });
         updateBracelet();
     }
 
+    function removeBead(index) {
+        selectedBeads.splice(index, 1);
+        updateBracelet();
+    }
+
     function distributeEvenly() {
+        if (selectedBeads.length === 0) return;
+        saveHistory();
         const n = selectedBeads.length;
         selectedBeads.forEach((b, i) => { b.angle = (i / n) * 2 * Math.PI; });
         updateBracelet();
     }
 
     function clearBeads() {
+        if (selectedBeads.length === 0) return;
+        saveHistory();
         selectedBeads = [];
         updateBracelet();
     }
 
+    function undoLast() {
+        if (beadHistory.length === 0) return;
+        selectedBeads = JSON.parse(beadHistory.pop());
+        updateUndoBtn();
+        updateBracelet();
+    }
+
+    function saveDesign() {
+        const svg    = document.getElementById('bracelet-svg');
+        const canvas = document.createElement('canvas');
+        canvas.width = 500; canvas.height = 500;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#0d1020';
+        ctx.fillRect(0, 0, 500, 500);
+        const svgStr = new XMLSerializer().serializeToString(svg);
+        const blob   = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+        const url    = URL.createObjectURL(blob);
+        const img    = new Image();
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0, 500, 500);
+            URL.revokeObjectURL(url);
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/png');
+            a.download = '鷗哩手作_手鍊設計.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+        img.src = url;
+    }
+
     const NS = "http://www.w3.org/2000/svg";
+
+    function makeStarPath(cx, cy, r) {
+        let d = '';
+        for (let i = 0; i < 10; i++) {
+            const rad = i % 2 === 0 ? r : r * 0.42;
+            const ang = (i * 36 - 90) * Math.PI / 180;
+            d += (i === 0 ? 'M ' : ' L ') + (cx + rad * Math.cos(ang)).toFixed(2) + ' ' + (cy + rad * Math.sin(ang)).toFixed(2);
+        }
+        return d + ' Z';
+    }
+
+    function makeHeartPath(cx, cy, r) {
+        const p = (dx, dy) => `${(cx + dx * r).toFixed(2)} ${(cy + dy * r).toFixed(2)}`;
+        return `M ${p(0, 1.0)}` +
+               ` C ${p(-0.5, 0.5)}, ${p(-1.0, 0.5)}, ${p(-1.0, 0)}` +
+               ` C ${p(-1.0, -0.7)}, ${p(-0.1, -0.7)}, ${p(0, -0.25)}` +
+               ` C ${p(0.1, -0.7)}, ${p(1.0, -0.7)}, ${p(1.0, 0)}` +
+               ` C ${p(1.0, 0.5)}, ${p(0.5, 0.5)}, ${p(0, 1.0)}` +
+               ` Z`;
+    }
 
     function updateBracelet() {
         const sizeCm = parseFloat(sizeInput.value);
@@ -1322,37 +1481,132 @@
         baseCircle.setAttribute('r', radius);
         beadsGroup.innerHTML = '';
 
+        // Remove per-bead dynamic defs from previous render
+        const svgDefs = braceletSvg.querySelector('defs');
+        svgDefs.querySelectorAll('[id^="g-dyn-"],[id^="cp-dyn-"]').forEach(el => el.remove());
+
         svgHint.style.display = selectedBeads.length === 0 ? '' : 'none';
 
+        // Update count display
+        const circMm    = getCircMm();
+        const usedMm    = getUsedMm();
+        const remaining = circMm - usedMm;
+        const nextSize  = parseFloat(beadSizeInput.value) || 6;
+        const countEl   = document.getElementById('bead-count');
+        if (countEl) {
+            countEl.textContent = `${selectedBeads.length} 顆 · 剩餘 ${remaining} mm`;
+            countEl.style.color = remaining < nextSize
+                ? 'rgba(252,165,165,0.85)' : 'var(--dim)';
+        }
+
+        // Pre-compute positions and detect overlaps
+        const pos = selectedBeads.map(b => ({
+            x: 150 + radius * Math.cos(b.angle),
+            y: 150 + radius * Math.sin(b.angle),
+            r: b.size * (8 / 6)
+        }));
+        const overlapping = new Set();
+        for (let i = 0; i < pos.length; i++) {
+            for (let j = i + 1; j < pos.length; j++) {
+                const dx = pos[i].x - pos[j].x, dy = pos[i].y - pos[j].y;
+                if (Math.sqrt(dx * dx + dy * dy) < pos[i].r + pos[j].r) {
+                    overlapping.add(i); overlapping.add(j);
+                }
+            }
+        }
+
         selectedBeads.forEach((bead, index) => {
-            const r = bead.size * (8 / 6);
-            const x = 150 + radius * Math.cos(bead.angle);
-            const y = 150 + radius * Math.sin(bead.angle);
+            const { x, y, r } = pos[index];
             const isDragging = draggedBeadIndex === index;
+            const isOverlap  = overlapping.has(index);
+            const isCharm    = CHARM_TYPES.has(bead.type);
 
-            const circle = document.createElementNS(NS, "circle");
-            circle.setAttribute("cx", x);
-            circle.setAttribute("cy", y);
-            circle.setAttribute("r", r);
-            circle.setAttribute("fill", `url(#g-${bead.type})`);
-            circle.setAttribute("stroke", isDragging ? "#e8d07a" : "rgba(255,255,255,0.2)");
-            circle.setAttribute("stroke-width", isDragging ? "2" : "1");
-            circle.setAttribute("filter", "url(#bead-shadow)");
-            circle.style.cursor = isDragging ? "grabbing" : "grab";
+            const elem = document.createElementNS(NS, isCharm ? "path" : "circle");
+            let fillUrl;
+            let pathData;
 
-            circle.addEventListener('mousedown', e => {
+            if (isCharm) {
+                pathData = bead.type === 'star-silver'
+                    ? makeStarPath(x, y, r)
+                    : makeHeartPath(x, y, r);
+                elem.setAttribute("d", pathData);
+
+                // Dynamic radial gradient: focal point at upper-left gives 3D sphere look
+                const gradId = `g-dyn-${index}`;
+                const grad = document.createElementNS(NS, "radialGradient");
+                grad.setAttribute("id", gradId);
+                grad.setAttribute("gradientUnits", "userSpaceOnUse");
+                grad.setAttribute("cx", x.toFixed(2));
+                grad.setAttribute("cy", y.toFixed(2));
+                grad.setAttribute("fx", (x - r * 0.35).toFixed(2));
+                grad.setAttribute("fy", (y - r * 0.35).toFixed(2));
+                grad.setAttribute("r",  (r * 1.15).toFixed(2));
+                [
+                    [0,    "#ffffff"],
+                    [0.18, "#e0e4ec"],
+                    [0.42, "#a0a8b8"],
+                    [0.70, "#505868"],
+                    [1.0,  "#1c2030"],
+                ].forEach(([off, col]) => {
+                    const s = document.createElementNS(NS, "stop");
+                    s.setAttribute("offset", off);
+                    s.setAttribute("stop-color", col);
+                    grad.appendChild(s);
+                });
+                svgDefs.appendChild(grad);
+                fillUrl = `url(#${gradId})`;
+
+                // Clip path so specular shine stays inside the charm shape
+                const cpId = `cp-dyn-${index}`;
+                const cp = document.createElementNS(NS, "clipPath");
+                cp.setAttribute("id", cpId);
+                const cpShape = document.createElementNS(NS, "path");
+                cpShape.setAttribute("d", pathData);
+                cp.appendChild(cpShape);
+                svgDefs.appendChild(cp);
+            } else {
+                elem.setAttribute("cx", x);
+                elem.setAttribute("cy", y);
+                elem.setAttribute("r", r);
+                fillUrl = `url(#g-${bead.type})`;
+            }
+
+            elem.setAttribute("fill", fillUrl);
+            elem.setAttribute("stroke",
+                isDragging ? "#e8d07a" :
+                isOverlap  ? "rgba(252,100,100,0.85)" :
+                             "rgba(255,255,255,0.2)");
+            elem.setAttribute("stroke-width", isDragging || isOverlap ? "2" : "1");
+            elem.setAttribute("filter", "url(#bead-shadow)");
+            elem.style.cursor = isDragging ? "grabbing" : "grab";
+
+            elem.addEventListener('mousedown', e => {
                 draggedBeadIndex = index;
-                circle.style.cursor = "grabbing";
+                hasDragged = false;
+                elem.style.cursor = "grabbing";
                 e.stopPropagation();
             });
 
-            circle.addEventListener('touchstart', e => {
+            elem.addEventListener('touchstart', e => {
                 draggedBeadIndex = index;
                 e.stopPropagation();
             }, { passive: true });
 
-            beadsGroup.appendChild(circle);
+            elem.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                saveHistory();
+                removeBead(index);
+            });
 
+            elem.addEventListener('dblclick', e => {
+                e.stopPropagation();
+                saveHistory();
+                removeBead(index);
+            });
+
+            beadsGroup.appendChild(elem);
+
+            // Specular highlight ellipse (clipped to shape for charms)
             const shine = document.createElementNS(NS, "ellipse");
             const ox = Math.cos(bead.angle - 0.6) * r * 0.28;
             const oy = Math.sin(bead.angle - 0.6) * r * 0.28;
@@ -1363,12 +1617,14 @@
             shine.setAttribute("fill", "rgba(255,255,255,0.5)");
             shine.setAttribute("transform", `rotate(-28,${x},${y})`);
             shine.style.pointerEvents = "none";
+            if (isCharm) shine.setAttribute("clip-path", `url(#cp-dyn-${index})`);
             beadsGroup.appendChild(shine);
         });
     }
 
     braceletSvg.addEventListener('mousemove', e => {
         if (draggedBeadIndex === null) return;
+        hasDragged = true;
         const rect = braceletSvg.getBoundingClientRect();
         const svgX = (e.clientX - rect.left) * (300 / rect.width);
         const svgY = (e.clientY - rect.top)  * (300 / rect.height);
@@ -1379,7 +1635,10 @@
     });
 
     window.addEventListener('mouseup', () => {
-        if (draggedBeadIndex !== null) { draggedBeadIndex = null; updateBracelet(); }
+        if (draggedBeadIndex !== null) {
+            draggedBeadIndex = null;
+            if (hasDragged) { hasDragged = false; updateBracelet(); }
+        }
     });
 
     braceletSvg.addEventListener('touchmove', e => {
