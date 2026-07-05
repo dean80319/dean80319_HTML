@@ -33,7 +33,11 @@
 左側選單點「🔮 占卜」觸發：
 - **Canvas 粒子動畫**：三層軌道環（紫/金/青色）+ 上升火花 + 能量脈衝環 + 高潮放射爆發
 - **Aurora CSS 層**：兩層 `conic-gradient` 旋轉光暈疊加在水晶球外
-- **水晶球**：彈簧入場動畫（`cubic-bezier(0.34, 1.56, 0.64, 1)`）
+- **水晶球（`.cb-ball`）**：彈簧入場動畫（`cubic-bezier(0.34, 1.56, 0.64, 1)`）；雙層背景漸層（左上玻璃反光 + 底部深色），`blur` 柔化 reflex 高光
+- **底座（`.cb-pedestal`）**：三層結構，深紫黑色搭金色邊
+  - `cb-ped-cradle`：橢圓碗架，金色發光頂緣（`::before` blur 光暈），`z-index: 2` 讓球視覺上坐入碗中
+  - `cb-ped-neck`：窄頸柱，兩側細金邊
+  - `cb-ped-foot`：寬底台，內嵌裝飾框線（`::before`）+ 頂緣金色微光（`::after`），強投影
 - **白光閃爍轉場**：動畫結束後全螢幕白光，切換至占卜結果頁
 
 ### 每日塔羅（占卜結果頁）
@@ -128,3 +132,4 @@ select option { background: #141b2e; color: rgba(255,255,255,0.9); }
 | 2026/06/29 | 全站重設計：glassmorphism UI、Canvas 占卜動畫、每日塔羅牌、寫實星球 SVG、覆蓋至 index.html 並推送 GitHub |
 | 2026/07/05 | 合併 index_new.html UI 改進至 index.html：Noto Sans TC、RWD 行動版、Active nav、閃爍星星、Select 修正、塔羅牌重置邏輯；本地與 GitHub 完全同步（commit 5870c3d） |
 | 2026/07/05 | 手鍊 DIY 大幅升級：銀珠、移除珠子、物理尺寸限制（混合尺寸）、重疊偵測、復原、儲存圖片；新增星星／愛心銀飾吊飾（固定 10mm，SVG `<path>` 動態焦點漸層 + clipPath 立體感） |
+| 2026/07/05 | 占卜場景重設計：水晶球加玻璃反光內漸層；底座改為三層 CSS 結構（碗架／頸柱／底台），深紫黑色 + 金色邊框光效 |
