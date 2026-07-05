@@ -88,6 +88,32 @@ select option { background: #141b2e; color: rgba(255,255,255,0.9); }
 
 ---
 
+## 檔案狀態（2026/07/05 更新）
+
+本地端與 GitHub 目前完全同步，皆為 commit `5870c3d`。
+
+- `index.html` — 正式版，與 `index_new.html` 內容完全一致
+- `index_new.html` — 同上（開發過程中的暫存檔，已合併完成）
+
+---
+
+## UI 改進清單（index_new.html 帶入的項目，現已合併至 index.html）
+
+- **Google Fonts**：`Noto Sans TC` 繁中網路字型
+- **`--card: rgba(255,255,255,0.07)`**：玻璃卡片透明度提升（原 0.032）
+- **17 顆閃爍星星**：`body::after` + `animation: starTwinkle 8s` alternate
+- **RWD 行動版側欄**：`@media (max-width: 768px)` — `position: fixed; transform: translateX(-100%)` + 半透明 backdrop
+- **Active nav 高亮**：`.nav-btn.active` CSS + `showPage(id, navBtn)` 更新 active class
+- **`focus-visible` 鍵盤輪廓**：所有互動元素加 `outline`
+- **SVG 空白提示**：`<text id="svg-hint">點擊上方水晶開始設計</text>`
+- **aria 屬性**：`aria-expanded`、`aria-label`、`aria-controls`
+- **子選單改 `<button>`**：原為 `<a href="#">`
+- **水晶選項**：`role="button" tabindex="0" aria-label="..."`
+- **手機自動收合側欄**：`showPage` 內呼叫 `closeSidebar()`
+- **`openSidebar()` / `closeSidebar()`**：分拆自 `toggleSidebar()`
+
+---
+
 ## 版本紀錄
 
 | 日期 | 內容 |
@@ -95,3 +121,4 @@ select option { background: #141b2e; color: rgba(255,255,255,0.9); }
 | 2026/06/19 | 手鍊 DIY 功能：最大空隙演算法、拖曳、均勻排列 |
 | 2026/06/27 | 占卜功能：水晶球動畫、轉場效果（原 index.html） |
 | 2026/06/29 | 全站重設計：glassmorphism UI、Canvas 占卜動畫、每日塔羅牌、寫實星球 SVG、覆蓋至 index.html 並推送 GitHub |
+| 2026/07/05 | 合併 index_new.html UI 改進至 index.html：Noto Sans TC、RWD 行動版、Active nav、閃爍星星、Select 修正、塔羅牌重置邏輯；本地與 GitHub 完全同步（commit 5870c3d） |
