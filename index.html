@@ -665,13 +665,16 @@
             border-radius: 50%;
             position: relative;
             overflow: hidden;
-            background: radial-gradient(circle at 50% 120%, rgba(255,255,255,0.09), rgba(10,5,30,0.7) 65%);
-            border: 1px solid rgba(200,180,255,0.18);
+            background:
+                radial-gradient(circle at 36% 30%, rgba(255,255,255,0.13) 0%, transparent 50%),
+                radial-gradient(circle at 50% 118%, rgba(160,110,255,0.20) 0%, rgba(10,5,30,0.74) 65%);
+            border: 1px solid rgba(210,190,255,0.22);
             box-shadow:
-                0 0 60px rgba(100,60,220,0.22),
-                0 0 120px rgba(80,40,200,0.10),
-                inset 0 0 35px rgba(255,255,255,0.06),
-                inset 0 -25px 55px rgba(0,0,0,0.75);
+                0 0 55px rgba(110,65,230,0.26),
+                0 0 110px rgba(80,40,200,0.13),
+                0 0 220px rgba(55,20,180,0.07),
+                inset 0 0 32px rgba(255,255,255,0.05),
+                inset 0 -30px 65px rgba(0,0,0,0.82);
             backdrop-filter: blur(6px);
         }
 
@@ -750,26 +753,121 @@
 
         .cb-reflex {
             position: absolute;
-            top: 8%; left: 14%;
-            width: 48px; height: 24px;
+            top: 9%; left: 15%;
+            width: 56px; height: 22px;
             border-radius: 50%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.65), transparent);
-            transform: rotate(-30deg);
+            background: linear-gradient(to bottom, rgba(255,255,255,0.70), transparent);
+            transform: rotate(-32deg);
             pointer-events: none;
+            filter: blur(2.5px);
         }
 
-        .cb-base {
-            width: 135px; height: 42px;
-            background: linear-gradient(to right, #3730a3, #1e1b4b 50%, #3730a3);
-            border-radius: 8px 8px 16px 16px;
-            border: 1px solid rgba(180,160,255,0.12);
-            box-shadow:
-                0 14px 28px rgba(0,0,0,0.65),
-                0  0  40px rgba(80,60,200,0.18),
-                inset 0 2px 5px rgba(255,255,255,0.16);
-            margin-top: -12px;
+        /* ─── Pedestal ─── */
+        .cb-pedestal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             position: relative;
-            z-index: -1;
+            z-index: 2;
+            margin-top: -22px;
+        }
+
+        /* Shallow bowl cradle that cups the ball */
+        .cb-ped-cradle {
+            width: 150px;
+            height: 34px;
+            position: relative;
+            background: linear-gradient(180deg,
+                rgba(22,13,54,0)    0%,
+                rgba(20,12,50,0.88) 22%,
+                rgba(13,8,38,0.97)  65%,
+                rgba(8,4,24,1)     100%
+            );
+            border-radius: 50% 50% 35% 35% / 58% 58% 42% 42%;
+            border-top: 2px solid rgba(201,162,39,0.82);
+            box-shadow:
+                0 8px 22px rgba(0,0,0,0.82),
+                inset 0 -4px 12px rgba(0,0,0,0.55),
+                0 0 20px rgba(130,90,15,0.14);
+        }
+
+        /* Glowing gold rim */
+        .cb-ped-cradle::before {
+            content: '';
+            position: absolute;
+            top: -4px; left: 14%; right: 14%;
+            height: 5px;
+            background: linear-gradient(to right,
+                transparent, rgba(255,215,55,0.82) 50%, transparent
+            );
+            border-radius: 50%;
+            filter: blur(2px);
+        }
+
+        /* Subtle inner-bowl depth gradient */
+        .cb-ped-cradle::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 12%; right: 12%;
+            height: 55%;
+            background: linear-gradient(to top, rgba(60,30,140,0.12), transparent);
+            border-radius: 0 0 40% 40% / 0 0 60% 60%;
+        }
+
+        /* Narrow neck column */
+        .cb-ped-neck {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(to right,
+                rgba(7,3,20,1)    0%,
+                rgba(26,16,64,1)  28%,
+                rgba(40,25,82,1)  50%,
+                rgba(26,16,64,1)  72%,
+                rgba(7,3,20,1)   100%
+            );
+            border-left:  1px solid rgba(201,162,39,0.28);
+            border-right: 1px solid rgba(201,162,39,0.28);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.75);
+        }
+
+        /* Wide ornate foot platform */
+        .cb-ped-foot {
+            width: 178px;
+            height: 24px;
+            position: relative;
+            background: linear-gradient(180deg,
+                rgba(44,28,94,1)  0%,
+                rgba(26,16,62,1)  42%,
+                rgba(11,6,30,1)  100%
+            );
+            border-radius: 3px 3px 14px 14px;
+            border-top: 1.5px solid rgba(201,162,39,0.52);
+            box-shadow:
+                0 18px 48px rgba(0,0,0,0.92),
+                0 5px 16px rgba(0,0,0,0.68),
+                0 0 36px rgba(58,32,148,0.10),
+                inset 0 1px 5px rgba(201,162,39,0.07),
+                inset 0 -2px 6px rgba(0,0,0,0.6);
+        }
+
+        /* Inset decorative panel border */
+        .cb-ped-foot::before {
+            content: '';
+            position: absolute;
+            inset: 4px 14px;
+            border: 1px solid rgba(201,162,39,0.17);
+            border-radius: 1px 1px 10px 10px;
+        }
+
+        /* Gold shimmer on top edge */
+        .cb-ped-foot::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 18%; right: 18%;
+            height: 1px;
+            background: linear-gradient(to right,
+                transparent, rgba(255,210,50,0.58), transparent
+            );
         }
 
         .oracle-text {
@@ -957,6 +1055,9 @@
             .c-sphere { width: 36px; height: 36px; }
 
             .cb-ball { width: 160px; height: 160px; }
+            .cb-ped-cradle { width: 110px; height: 26px; }
+            .cb-ped-neck   { width: 26px;  height: 26px; }
+            .cb-ped-foot   { width: 130px; height: 18px; }
         }
 
         @media (max-width: 480px) {
@@ -1276,7 +1377,11 @@
             <div class="cb-iglow"   id="cb-iglow"></div>
             <div class="cb-reflex"></div>
         </div>
-        <div class="cb-base"></div>
+        <div class="cb-pedestal">
+            <div class="cb-ped-cradle"></div>
+            <div class="cb-ped-neck"></div>
+            <div class="cb-ped-foot"></div>
+        </div>
         <div class="oracle-text" id="oracle-text">✦ 命運正在揭示 ✦</div>
     </div>
 </div>
