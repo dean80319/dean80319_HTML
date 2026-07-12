@@ -509,6 +509,23 @@
 
         #bracelet-svg { width: 100%; max-width: 250px; height: auto; }
 
+        .oil-hero {
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(201,162,39,0.28);
+            box-shadow: 0 14px 34px rgba(0,0,0,0.45), 0 0 30px rgba(180,120,255,0.14);
+            margin: 0.2rem 0 1.6rem;
+        }
+
+        .oil-hero img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 340px;
+            object-fit: cover;
+            object-position: 50% 38%;
+        }
+
         .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
         .btn {
@@ -1959,7 +1976,9 @@
             <div class="card">
                 <button class="btn-back"
                         onclick="showPage('magic-hub', document.getElementById('nav-magic'))">← 返回魔法世界</button>
-                <span class="welcome-icon">🧪</span>
+                <div class="oil-hero">
+                    <img src="picture/進入精油圖_女巫調製_GEMINI生成.png" alt="女巫在鍋爐前調製精油" loading="lazy">
+                </div>
                 <h1 class="welcome-title">精油</h1>
                 <p class="welcome-body">
                     女巫的鍊金鍋爐正在調配新的配方<br>
