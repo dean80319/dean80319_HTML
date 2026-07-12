@@ -1018,6 +1018,563 @@
         .fortune-text.show { opacity: 1; transform: translateY(0); }
 
         /* ═══════════════════════════════════════════
+           MAGIC WORLD HUB
+        ═══════════════════════════════════════════ */
+        .magic-choice-row {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.8rem;
+        }
+
+        .magic-choice {
+            flex: 1 1 160px;
+            max-width: 210px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-top: 1px solid rgba(201,162,39,0.25);
+            border-radius: 18px;
+            padding: 1.7rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 9px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform var(--t), border-color var(--t), box-shadow var(--t);
+        }
+
+        .magic-choice:hover {
+            transform: translateY(-6px);
+            border-color: rgba(201,162,39,0.35);
+            box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+        }
+
+        .mc-icon {
+            width: 58px; height: 58px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.65rem;
+            box-shadow:
+                0 4px 14px rgba(0,0,0,0.4),
+                inset 0 -3px 8px rgba(0,0,0,0.35),
+                inset 0 3px 6px rgba(255,255,255,0.15);
+        }
+
+        .mc-icon-divination { background: radial-gradient(circle at 35% 30%, #c4b5fd, #7c3aed 55%, #2e1065); }
+        .mc-icon-oil        { background: radial-gradient(circle at 35% 30%, #fbcfe8, #ec4899 45%, #7e22ce 85%); }
+
+        .mc-name { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: 1px; }
+        .mc-desc { font-size: 0.72rem; color: var(--dim); text-align: center; line-height: 1.5; }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: none;
+            color: var(--dim);
+            font-size: 0.78rem;
+            font-family: inherit;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            padding: 4px 2px;
+            transition: color var(--t);
+        }
+
+        .btn-back:hover { color: var(--gold-lt); }
+
+        /* ═══════════════════════════════════════════
+           MAGIC CIRCLE OVERLAY (魔法世界入場動畫)
+        ═══════════════════════════════════════════ */
+        #magic-overlay {
+            position: fixed; inset: 0;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(ellipse 80% 70% at 50% 45%, #140a2e 0%, #030412 70%, #000 100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.55s ease;
+        }
+
+        #magic-overlay.show { opacity: 1; pointer-events: all; }
+
+        #magic-canvas { position: absolute; inset: 0; pointer-events: none; }
+
+        #magic-scene {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            transform: scale(0.08);
+            opacity: 0;
+            transition:
+                transform 0.72s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity   0.4s  ease;
+        }
+
+        #magic-scene.appear { transform: scale(1); opacity: 1; }
+
+        #magic-circle-svg { width: 260px; height: 260px; overflow: visible; }
+
+        .mg-ring {
+            fill: none;
+            stroke-width: 2;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            transition: stroke-dashoffset 1.1s ease;
+            filter: drop-shadow(0 0 6px currentColor);
+        }
+
+        .mg-ring.draw { stroke-dashoffset: 0; }
+        .mg-ring-outer { stroke: rgba(201,162,39,0.85); color: rgba(201,162,39,0.85); }
+        .mg-ring-inner { stroke: rgba(150,90,255,0.75); color: rgba(150,90,255,0.75); transition-delay: 0.15s; }
+
+        .mg-star {
+            fill: none;
+            stroke: rgba(232,208,122,0.9);
+            stroke-width: 1.6;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            transition: stroke-dashoffset 1.3s ease;
+            transition-delay: 0.3s;
+            filter: drop-shadow(0 0 8px rgba(201,162,39,0.6));
+        }
+
+        .mg-star.draw { stroke-dashoffset: 0; }
+
+        .mg-runes {
+            opacity: 0;
+            transform-origin: 150px 150px;
+            transition: opacity 0.6s ease;
+        }
+
+        .mg-runes.on { opacity: 1; animation: mgSpin 7s linear infinite; }
+        .mg-runes rect { fill: rgba(201,162,39,0.8); }
+
+        @keyframes mgSpin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        .mg-core { opacity: 0; transition: opacity 1s ease; }
+        .mg-core.bright { opacity: 1; }
+
+        .magic-portal-text {
+            margin-top: 18px;
+            font-size: 0.82rem;
+            letter-spacing: 5px;
+            color: rgba(201,162,39,0);
+            transition: color 1.1s ease;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .magic-portal-text.visible { color: rgba(201,162,39,0.75); }
+
+        /* ═══════════════════════════════════════════
+           OIL BREWING OVERLAY (女巫熬煮精油動畫)
+        ═══════════════════════════════════════════ */
+        #oil-overlay {
+            position: fixed; inset: 0;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(ellipse 80% 70% at 50% 45%, #170a24 0%, #050308 70%, #000 100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.55s ease;
+            overflow: hidden;
+        }
+
+        #oil-overlay.show { opacity: 1; pointer-events: all; }
+
+        #oil-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+
+        #oil-scene {
+            position: relative;
+            z-index: 1;
+            width: 300px;
+            height: 340px;
+            transform: scale(0.08);
+            opacity: 0;
+            transition:
+                transform 0.72s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity   0.4s  ease;
+        }
+
+        #oil-scene.appear { transform: scale(1); opacity: 1; }
+
+        .oil-witch {
+            position: absolute;
+            left: 8px; top: 4px;
+            width: 130px; height: 200px;
+            opacity: 0;
+            transform: translateY(-14px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .oil-witch.appear { opacity: 1; transform: translateY(0); }
+
+        .oil-witch-hat {
+            position: absolute; top: 0; left: 14px;
+            width: 0; height: 0;
+            border-left: 34px solid transparent;
+            border-right: 34px solid transparent;
+            border-bottom: 70px solid #241536;
+            filter: drop-shadow(0 0 10px rgba(140,80,255,0.25));
+        }
+
+        .oil-witch-hat-band {
+            position: absolute; top: 62px; left: 16px;
+            width: 64px; height: 8px;
+            background: linear-gradient(90deg, #7c3aed, #c9a227);
+            border-radius: 3px;
+        }
+
+        .oil-witch-hat-brim {
+            position: absolute; top: 69px; left: 3px;
+            width: 90px; height: 14px;
+            background: #241536;
+            border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+        }
+
+        .oil-witch-head {
+            position: absolute; top: 78px; left: 32px;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #3a2550;
+        }
+
+        .oil-witch-robe {
+            position: absolute; top: 100px; left: -4px;
+            width: 104px; height: 100px;
+            background: linear-gradient(160deg, #2b1a48, #140a24 70%);
+            clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+            box-shadow: inset -6px 0 14px rgba(0,0,0,0.4);
+        }
+
+        .oil-witch-arm {
+            position: absolute; top: 118px; left: 78px;
+            width: 70px; height: 10px;
+            background: linear-gradient(90deg, #2b1a48, #4a2f70);
+            border-radius: 6px;
+            transform-origin: 6px 5px;
+            transform: rotate(6deg);
+            animation: stirWiggle 1.1s ease-in-out infinite;
+        }
+
+        .oil-stir {
+            position: absolute; right: -4px; top: -2px;
+            width: 6px; height: 56px;
+            background: linear-gradient(180deg, #8a5a2c, #5c3a1a);
+            border-radius: 3px;
+            transform: rotate(70deg);
+            transform-origin: top center;
+        }
+
+        @keyframes stirWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            50%      { transform: rotate(14deg); }
+        }
+
+        .oil-herb {
+            position: absolute;
+            width: 14px; height: 14px;
+            left: 122px; top: 122px;
+            background: radial-gradient(circle at 35% 30%, #8bcf5e, #3f8f2c 60%, #1f5c16);
+            clip-path: polygon(50% 0%, 80% 20%, 100% 55%, 65% 100%, 35% 100%, 0% 55%, 20% 20%);
+            opacity: 0;
+            animation: herbFall 1.1s ease-in forwards;
+            pointer-events: none;
+        }
+
+        @keyframes herbFall {
+            0%   { transform: translate(0,0) rotate(0deg);        opacity: 0; }
+            12%  { opacity: 1; }
+            100% { transform: translate(-26px,96px) rotate(260deg); opacity: 0; }
+        }
+
+        .oil-vial {
+            position: absolute;
+            right: 14px; top: 22px;
+            width: 26px; height: 54px;
+            opacity: 0;
+            transform-origin: 50% 90%;
+            transition: opacity 0.4s ease;
+        }
+
+        .oil-vial.appear { opacity: 1; }
+
+        .oil-vial-body {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 6px 6px 10px 10px;
+            overflow: hidden;
+        }
+
+        .oil-vial-body::after {
+            content: '';
+            position: absolute; left: 2px; right: 2px; bottom: 2px;
+            height: 60%;
+            background: linear-gradient(180deg, #ffcf6b, #c9861a);
+            border-radius: 4px 4px 8px 8px;
+        }
+
+        .oil-vial.pour { animation: vialPour 1.3s ease-in-out forwards; }
+
+        @keyframes vialPour {
+            0%   { transform: rotate(0deg); }
+            40%  { transform: rotate(-125deg); }
+            75%  { transform: rotate(-125deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .oil-pour-stream {
+            position: absolute; left: -6px; top: 34px;
+            width: 4px; height: 0;
+            background: linear-gradient(180deg, #ffd98a, #c9861a);
+            border-radius: 2px;
+            opacity: 0;
+            box-shadow: 0 0 6px rgba(255,200,90,0.6);
+        }
+
+        .oil-pour-stream.flow { animation: streamGrow 1s ease-in-out forwards; }
+
+        @keyframes streamGrow {
+            0%   { height: 0;    opacity: 0; }
+            20%  { opacity: 1; }
+            60%  { height: 60px; opacity: 1; }
+            100% { height: 60px; opacity: 0; }
+        }
+
+        .oil-cauldron-wrap {
+            position: absolute;
+            left: 50%; top: 130px;
+            transform: translateX(-50%);
+            width: 200px; height: 170px;
+        }
+
+        .oil-steam {
+            position: absolute; left: 50%; top: 4px;
+            transform: translateX(-50%);
+            width: 60px; height: 60px;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .oil-cauldron-wrap.lit .oil-steam { opacity: 1; }
+
+        .oil-steam::before, .oil-steam::after {
+            content: '';
+            position: absolute; bottom: 0;
+            width: 14px; height: 34px;
+            background: rgba(215,190,255,0.16);
+            filter: blur(6px);
+            border-radius: 50%;
+            animation: steamRise 2.4s ease-in infinite;
+        }
+
+        .oil-steam::after { left: 20px; animation-delay: 1.1s; }
+
+        @keyframes steamRise {
+            0%   { transform: translateY(0) scaleX(1);      opacity: 0; }
+            20%  { opacity: 0.5; }
+            100% { transform: translateY(-70px) scaleX(1.6); opacity: 0; }
+        }
+
+        .oil-cauldron {
+            position: absolute; left: 50%; top: 44px;
+            transform: translateX(-50%);
+            width: 170px; height: 84px;
+            border-radius: 50% 50% 40% 40% / 65% 65% 35% 35%;
+            background:
+                linear-gradient(125deg, rgba(255,255,255,0.26) 0%, rgba(255,255,255,0.06) 22%, transparent 42%),
+                linear-gradient(215deg, rgba(255,255,255,0.13) 0%, transparent 32%),
+                radial-gradient(ellipse at 38% 28%, rgba(196,160,255,0.65) 0%, rgba(124,58,237,0.55) 40%, rgba(76,29,149,0.55) 72%, rgba(24,12,42,0.55) 100%);
+            border: 1.5px solid rgba(210,180,255,0.55);
+            box-shadow:
+                inset 0 10px 22px rgba(90,45,170,0.32),
+                inset 0 -14px 18px rgba(0,0,0,0.30),
+                0 14px 32px rgba(50,20,100,0.32),
+                0 0 26px rgba(160,100,255,0.30);
+            backdrop-filter: blur(1px);
+            overflow: hidden;
+            transition: background 0.5s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+        }
+
+        .oil-cauldron.boil-fast {
+            background:
+                linear-gradient(125deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.08) 22%, transparent 42%),
+                linear-gradient(215deg, rgba(255,255,255,0.15) 0%, transparent 32%),
+                radial-gradient(ellipse at 38% 28%, rgba(255,214,246,0.75) 0%, rgba(244,114,182,0.6) 40%, rgba(168,85,247,0.55) 72%, rgba(60,15,60,0.55) 100%);
+            box-shadow:
+                inset 0 10px 26px rgba(244,114,182,0.4),
+                inset 0 -14px 18px rgba(0,0,0,0.3),
+                0 0 40px rgba(244,114,182,0.5);
+        }
+
+        .oil-cauldron.flash {
+            border-color: rgba(255,190,235,0.9);
+            box-shadow:
+                inset 0 10px 26px rgba(244,114,182,0.5),
+                0 0 70px 24px rgba(244,114,182,0.9);
+        }
+
+        .oil-bubble {
+            position: absolute; bottom: 2px;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.75);
+            opacity: 0;
+            animation: bubbleRise 2.6s ease-in infinite;
+        }
+
+        @keyframes bubbleRise {
+            0%   { transform: translateY(0) scale(0.4);  opacity: 0; }
+            15%  { opacity: 0.85; }
+            90%  { opacity: 0; }
+            100% { transform: translateY(-22px) scale(1); opacity: 0; }
+        }
+
+        .oil-cauldron.boil-fast .oil-bubble { animation-duration: 0.9s; }
+
+        .oil-legs span {
+            position: absolute; bottom: 30px;
+            width: 9px; height: 22px;
+            background: linear-gradient(180deg, rgba(215,185,255,0.55), rgba(90,55,150,0.65));
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(160,100,255,0.35);
+        }
+
+        .oil-legs .leg-l { left: 46px;  transform: rotate(-18deg); }
+        .oil-legs .leg-m { left: 95px; }
+        .oil-legs .leg-r { left: 140px; transform: rotate(18deg); }
+
+        .oil-magic-pad {
+            position: absolute; left: 50%; bottom: 6px;
+            transform: translateX(-50%);
+            width: 150px; height: 44px;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            animation: padHueCycle 7s linear infinite;
+        }
+
+        .oil-cauldron-wrap.lit .oil-magic-pad { opacity: 1; }
+        .oil-cauldron-wrap.boil-fast .oil-magic-pad { animation-duration: 1.3s; }
+
+        @keyframes padHueCycle {
+            from { filter: hue-rotate(0deg); }
+            to   { filter: hue-rotate(360deg); }
+        }
+
+        .omp-ring {
+            position: absolute; inset: 0;
+            border-radius: 50%;
+            border: 2px solid rgba(180,120,255,0.7);
+            box-shadow: 0 0 16px rgba(180,120,255,0.55);
+        }
+
+        .omp-ring-inner {
+            inset: 10px 24px;
+            border-color: rgba(255,215,120,0.65);
+            box-shadow: 0 0 12px rgba(255,215,120,0.5);
+        }
+
+        .omp-dot {
+            position: absolute; top: 50%; left: 50%;
+            width: 7px; height: 7px;
+            margin: -3.5px 0 0 -3.5px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 0%, rgba(255,255,255,0.9) 40%, transparent 75%);
+            box-shadow: 0 0 10px 3px rgba(210,170,255,0.85);
+        }
+
+        .omp-dot-outer-a {
+            offset-path: ellipse(75px 22px at 50% 50%);
+            animation: ompTravel 3.4s linear infinite;
+        }
+
+        .omp-dot-outer-b {
+            offset-path: ellipse(75px 22px at 50% 50%);
+            animation: ompTravel 3.4s linear infinite;
+            animation-delay: -1.7s;
+            background: radial-gradient(circle, #fff8dc 0%, rgba(255,235,160,0.9) 40%, transparent 75%);
+            box-shadow: 0 0 10px 3px rgba(255,215,120,0.8);
+        }
+
+        .omp-dot-inner {
+            width: 6px; height: 6px;
+            margin: -3px 0 0 -3px;
+            offset-path: ellipse(51px 12px at 50% 50%);
+            animation: ompTravel 2.5s linear infinite reverse;
+        }
+
+        @keyframes ompTravel {
+            from { offset-distance: 0%; }
+            to   { offset-distance: 100%; }
+        }
+
+        .oil-cauldron-wrap.boil-fast .omp-dot-outer-a,
+        .oil-cauldron-wrap.boil-fast .omp-dot-outer-b { animation-duration: 1.1s; }
+        .oil-cauldron-wrap.boil-fast .omp-dot-inner    { animation-duration: 0.8s; }
+
+        .omp-core {
+            position: absolute; left: 50%; top: 50%;
+            width: 20px; height: 20px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff, #d9b8ff 45%, transparent 75%);
+            filter: blur(1px);
+            box-shadow: 0 0 24px 8px rgba(200,150,255,0.6);
+        }
+
+        .oil-brew-text {
+            position: absolute;
+            left: 0; right: 0; bottom: -6px;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            color: rgba(244,114,182,0);
+            transition: color 1s ease;
+            text-align: center;
+        }
+
+        .oil-brew-text.visible { color: rgba(244,114,182,0.8); }
+
+        #oil-fog-layer {
+            position: absolute; inset: 0;
+            z-index: 5;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        .oil-fog {
+            position: absolute; inset: -30%;
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0.3);
+            filter: blur(50px);
+            transition:
+                transform 1.7s cubic-bezier(0.16, 0.84, 0.44, 1),
+                opacity   1.3s ease;
+        }
+
+        .oil-fog1 { background: radial-gradient(circle at 40% 55%, rgba(244,114,182,0.85), rgba(192,132,252,0.55) 45%, transparent 72%); }
+        .oil-fog2 { background: radial-gradient(circle at 60% 40%, rgba(216,140,255,0.75), rgba(244,114,182,0.40) 50%, transparent 75%); transition-delay: 0.12s; }
+        .oil-fog3 { background: radial-gradient(circle at 50% 65%, rgba(255,182,230,0.70), rgba(168,85,247,0.40) 55%, transparent 78%); transition-delay: 0.24s; }
+
+        .oil-fog.burst { opacity: 0.95; transform: scale(1.15); }
+
+        /* ═══════════════════════════════════════════
            RESPONSIVE — MOBILE
         ═══════════════════════════════════════════ */
         @media (max-width: 768px) {
@@ -1058,6 +1615,12 @@
             .cb-ped-cradle { width: 110px; height: 26px; }
             .cb-ped-neck   { width: 26px;  height: 26px; }
             .cb-ped-foot   { width: 130px; height: 18px; }
+
+            .magic-choice { max-width: 150px; padding: 1.3rem 0.9rem; }
+            #magic-circle-svg { width: 200px; height: 200px; }
+
+            #oil-scene { width: 230px; height: 270px; transform: scale(0.06); }
+            #oil-scene.appear { transform: scale(0.82); }
         }
 
         @media (max-width: 480px) {
@@ -1130,9 +1693,9 @@
             </div>
 
             <div>
-                <button class="nav-btn" id="nav-divination" onclick="startDivination(this)">
-                    <span class="ico">🔮</span>
-                    <span class="lbl">占卜</span>
+                <button class="nav-btn" id="nav-magic" onclick="startMagicWorld(this)">
+                    <span class="ico">🪄</span>
+                    <span class="lbl">魔法世界</span>
                 </button>
             </div>
 
@@ -1335,9 +1898,36 @@
             </div>
         </div>
 
+        <!-- ── Magic World Hub ── -->
+        <div class="page" id="page-magic-hub">
+            <div class="card">
+                <span class="welcome-icon">🪄</span>
+                <h1 class="welcome-title">魔法世界</h1>
+                <p class="welcome-body">
+                    在星光與藥草之間<br>
+                    選擇一段旅程
+                </p>
+                <div class="magic-choice-row">
+                    <button class="magic-choice"
+                            onclick="startDivination(document.getElementById('nav-magic'))">
+                        <div class="mc-icon mc-icon-divination">🔮</div>
+                        <div class="mc-name">占卜</div>
+                        <div class="mc-desc">水晶球與塔羅指引</div>
+                    </button>
+                    <button class="magic-choice" onclick="startOilBrewing()">
+                        <div class="mc-icon mc-icon-oil">🧪</div>
+                        <div class="mc-name">精油</div>
+                        <div class="mc-desc">女巫的香氛鍊金術</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- ── Divination Result ── -->
         <div class="page" id="page-divination">
             <div class="card">
+                <button class="btn-back"
+                        onclick="showPage('magic-hub', document.getElementById('nav-magic'))">← 返回魔法世界</button>
                 <span class="div-icon">🔮</span>
                 <h1 class="div-title">命運啟示</h1>
                 <div class="div-box">
@@ -1364,6 +1954,20 @@
             </div>
         </div>
 
+        <!-- ── Essential Oil (精油) ── -->
+        <div class="page" id="page-oil">
+            <div class="card">
+                <button class="btn-back"
+                        onclick="showPage('magic-hub', document.getElementById('nav-magic'))">← 返回魔法世界</button>
+                <span class="welcome-icon">🧪</span>
+                <h1 class="welcome-title">精油</h1>
+                <p class="welcome-body">
+                    女巫的鍊金鍋爐正在調配新的配方<br>
+                    敬請期待
+                </p>
+            </div>
+        </div>
+
     </main>
 </div>
 
@@ -1385,6 +1989,87 @@
         <div class="oracle-text" id="oracle-text">✦ 命運正在揭示 ✦</div>
     </div>
 </div>
+
+<div id="magic-overlay" style="display:none;">
+    <canvas id="magic-canvas"></canvas>
+    <div id="magic-scene">
+        <svg id="magic-circle-svg" viewBox="0 0 300 300">
+            <defs>
+                <radialGradient id="g-mg-core" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stop-color="#fffdf0"/>
+                    <stop offset="45%"  stop-color="#e8d07a"/>
+                    <stop offset="100%" stop-color="rgba(201,162,39,0)"/>
+                </radialGradient>
+            </defs>
+            <circle class="mg-ring mg-ring-outer" id="mg-ring-outer"
+                    cx="150" cy="150" r="132" pathLength="100"/>
+            <circle class="mg-ring mg-ring-inner" id="mg-ring-inner"
+                    cx="150" cy="150" r="104" pathLength="100"/>
+            <path class="mg-star" id="mg-star" pathLength="100"
+                  d="M150,42 L179,122 L263,122 L196,170 L221,250 L150,201 L79,250 L104,170 L37,122 L121,122 Z"/>
+            <g class="mg-runes" id="mg-runes">
+                <rect x="147" y="10" width="6" height="12" rx="1" transform="rotate(0 150 150)"/>
+                <rect x="147" y="10" width="6" height="12" rx="1" transform="rotate(45 150 150)"/>
+                <rect x="147" y="10" width="6" height="12" rx="1" transform="rotate(90 150 150)"/>
+                <rect x="147" y="10" width="6" height="12" rx="1" transform="rotate(135 150 150)"/>
+                <rect x="147" y="10" width="6" height="12" rx="1" transform="rotate(180 150 150)"/>
+                <rect x="147" y="10" width="6" height="12" rx="1" transform="rotate(225 150 150)"/>
+                <rect x="147" y="10" width="6" height="12" rx="1" transform="rotate(270 150 150)"/>
+                <rect x="147" y="10" width="6" height="12" rx="1" transform="rotate(315 150 150)"/>
+            </g>
+            <circle class="mg-core" id="mg-core" cx="150" cy="150" r="16" fill="url(#g-mg-core)"/>
+        </svg>
+        <div class="magic-portal-text" id="magic-portal-text">✦ 魔法之門正在開啟 ✦</div>
+    </div>
+</div>
+
+<div id="oil-overlay" style="display:none;">
+    <canvas id="oil-canvas"></canvas>
+    <div id="oil-scene">
+        <div class="oil-witch" id="oil-witch">
+            <div class="oil-witch-hat"></div>
+            <div class="oil-witch-hat-band"></div>
+            <div class="oil-witch-hat-brim"></div>
+            <div class="oil-witch-head"></div>
+            <div class="oil-witch-robe"></div>
+            <div class="oil-witch-arm"><div class="oil-stir"></div></div>
+        </div>
+        <div class="oil-vial" id="oil-vial">
+            <div class="oil-vial-body"></div>
+            <div class="oil-pour-stream" id="oil-pour-stream"></div>
+        </div>
+        <div class="oil-cauldron-wrap" id="oil-cauldron-wrap">
+            <div class="oil-steam"></div>
+            <div class="oil-cauldron" id="oil-cauldron">
+                <span class="oil-bubble" style="left:14%; animation-delay:0s;"></span>
+                <span class="oil-bubble" style="left:32%; animation-delay:0.5s;"></span>
+                <span class="oil-bubble" style="left:50%; animation-delay:1s;"></span>
+                <span class="oil-bubble" style="left:66%; animation-delay:0.3s;"></span>
+                <span class="oil-bubble" style="left:82%; animation-delay:0.8s;"></span>
+            </div>
+            <div class="oil-legs">
+                <span class="leg-l"></span>
+                <span class="leg-m"></span>
+                <span class="leg-r"></span>
+            </div>
+            <div class="oil-magic-pad" id="oil-magic-pad">
+                <div class="omp-ring omp-ring-outer"></div>
+                <div class="omp-ring omp-ring-inner"></div>
+                <span class="omp-dot omp-dot-outer-a"></span>
+                <span class="omp-dot omp-dot-outer-b"></span>
+                <span class="omp-dot omp-dot-inner"></span>
+                <div class="omp-core"></div>
+            </div>
+            <div class="oil-brew-text" id="oil-brew-text">✦ 藥劑正在調製 ✦</div>
+        </div>
+        <div id="oil-fog-layer">
+            <div class="oil-fog oil-fog1" id="oil-fog1"></div>
+            <div class="oil-fog oil-fog2" id="oil-fog2"></div>
+            <div class="oil-fog oil-fog3" id="oil-fog3"></div>
+        </div>
+    </div>
+</div>
+
 <div id="screen-flash"></div>
 
 <script>
@@ -2427,6 +3112,271 @@
             if (flipCard)    flipCard.classList.remove('flipped');
             if (fortuneEl)   { fortuneEl.classList.remove('show'); fortuneEl.textContent = ''; }
         }, 4260);
+    }
+
+    // ─── Magic World portal animation ───
+    function startMagicWorld(navBtn) {
+        if (window.innerWidth <= 768) closeSidebar();
+
+        const overlay = document.getElementById('magic-overlay');
+        const scene   = document.getElementById('magic-scene');
+        const ringO   = document.getElementById('mg-ring-outer');
+        const ringI   = document.getElementById('mg-ring-inner');
+        const star    = document.getElementById('mg-star');
+        const runes   = document.getElementById('mg-runes');
+        const core    = document.getElementById('mg-core');
+        const ptext   = document.getElementById('magic-portal-text');
+        const flash   = document.getElementById('screen-flash');
+        const canvas  = document.getElementById('magic-canvas');
+
+        scene.classList.remove('appear');
+        ringO.classList.remove('draw');
+        ringI.classList.remove('draw');
+        star.classList.remove('draw');
+        runes.classList.remove('on');
+        core.classList.remove('bright');
+        ptext.classList.remove('visible');
+        flash.classList.remove('flash');
+
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const CX = canvas.width  / 2;
+        const CY = canvas.height / 2;
+
+        let motes   = [];
+        let animTime = 0;
+        let running  = true;
+        let rafId;
+
+        function spawnMote() {
+            const ang  = Math.random() * Math.PI * 2;
+            const dist = 260 + Math.random() * 220;
+            motes.push({
+                x: CX + Math.cos(ang) * dist,
+                y: CY + Math.sin(ang) * dist,
+                ang, dist,
+                spd:  0.55 + Math.random() * 0.9,
+                sz:   1 + Math.random() * 2.2,
+                col:  Math.random() > 0.5 ? [201, 162, 39] : [150, 90, 255],
+                life: 1,
+            });
+        }
+
+        function loop() {
+            if (!running) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            animTime++;
+
+            const converging = animTime < 70;
+            const burst = Math.max(0, (animTime - 70) / 40);
+
+            if (converging && animTime % 3 === 0) spawnMote();
+
+            motes.forEach(m => {
+                if (burst <= 0) {
+                    m.dist -= m.spd * 2.2;
+                    if (m.dist < 6) m.life = 0;
+                } else {
+                    m.dist += m.spd * 9 * burst;
+                    m.life -= 0.02;
+                }
+                m.x = CX + Math.cos(m.ang) * m.dist;
+                m.y = CY + Math.sin(m.ang) * m.dist;
+                if (m.life > 0) {
+                    const [rr, gg, bb] = m.col;
+                    ctx.beginPath();
+                    ctx.arc(m.x, m.y, m.sz, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${rr},${gg},${bb},${m.life * 0.85})`;
+                    ctx.fill();
+                }
+            });
+            motes = motes.filter(m => m.life > 0);
+
+            if (animTime < 120) rafId = requestAnimationFrame(loop);
+        }
+
+        overlay.style.display = 'flex';
+        void overlay.offsetWidth;
+        overlay.classList.add('show');
+
+        setTimeout(() => scene.classList.add('appear'), 120);
+        setTimeout(() => { ringO.classList.add('draw'); rafId = requestAnimationFrame(loop); }, 260);
+        setTimeout(() => ringI.classList.add('draw'), 420);
+        setTimeout(() => star.classList.add('draw'),  620);
+        setTimeout(() => runes.classList.add('on'),   900);
+        setTimeout(() => core.classList.add('bright'), 1500);
+        setTimeout(() => ptext.classList.add('visible'), 1500);
+        setTimeout(() => flash.classList.add('flash'),  2200);
+
+        setTimeout(() => {
+            running = false;
+            cancelAnimationFrame(rafId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            showPage('magic-hub', navBtn);
+            overlay.classList.remove('show');
+            scene.classList.remove('appear');
+            ringO.classList.remove('draw');
+            ringI.classList.remove('draw');
+            star.classList.remove('draw');
+            runes.classList.remove('on');
+            core.classList.remove('bright');
+            ptext.classList.remove('visible');
+            flash.classList.remove('flash');
+
+            setTimeout(() => { overlay.style.display = 'none'; }, 660);
+        }, 2500);
+    }
+
+    // ─── Oil brewing (witch cauldron) animation ───
+    function dropHerb(scene) {
+        const herb = document.createElement('div');
+        herb.className = 'oil-herb';
+        herb.style.left = (110 + Math.random() * 20) + 'px';
+        herb.style.top  = (110 + Math.random() * 16) + 'px';
+        scene.appendChild(herb);
+        setTimeout(() => herb.remove(), 1200);
+    }
+
+    function startOilBrewing() {
+        if (window.innerWidth <= 768) closeSidebar();
+        const navBtn = document.getElementById('nav-magic');
+
+        const overlay   = document.getElementById('oil-overlay');
+        const scene     = document.getElementById('oil-scene');
+        const witch     = document.getElementById('oil-witch');
+        const vial      = document.getElementById('oil-vial');
+        const stream    = document.getElementById('oil-pour-stream');
+        const cauldronW = document.getElementById('oil-cauldron-wrap');
+        const cauldron  = document.getElementById('oil-cauldron');
+        const brewText  = document.getElementById('oil-brew-text');
+        const fog1      = document.getElementById('oil-fog1');
+        const fog2      = document.getElementById('oil-fog2');
+        const fog3      = document.getElementById('oil-fog3');
+        const flash     = document.getElementById('screen-flash');
+        const canvas    = document.getElementById('oil-canvas');
+
+        scene.classList.remove('appear');
+        witch.classList.remove('appear');
+        vial.classList.remove('appear', 'pour');
+        stream.classList.remove('flow');
+        cauldronW.classList.remove('lit', 'boil-fast');
+        cauldron.classList.remove('boil-fast', 'flash');
+        brewText.classList.remove('visible');
+        fog1.classList.remove('burst');
+        fog2.classList.remove('burst');
+        fog3.classList.remove('burst');
+        flash.classList.remove('flash');
+        scene.querySelectorAll('.oil-herb').forEach(h => h.remove());
+
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const CX = canvas.width  / 2;
+        const CY = canvas.height / 2 + 40;
+
+        let puffs    = [];
+        let running  = true;
+        let bursting = false;
+        let rafId;
+
+        function spawnPuff() {
+            const ang = Math.random() * Math.PI * 2;
+            puffs.push({
+                x: CX, y: CY,
+                vx: Math.cos(ang) * (1.4 + Math.random() * 2.4),
+                vy: Math.sin(ang) * (1.4 + Math.random() * 2.4) - 0.6,
+                sz:   40 + Math.random() * 70,
+                grow: 1.02 + Math.random() * 0.02,
+                col:  Math.random() > 0.5 ? [244, 114, 182] : [192, 132, 252],
+                life: 1,
+                dec:  0.006 + Math.random() * 0.006,
+            });
+        }
+
+        function loop() {
+            if (!running) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (bursting && puffs.length < 90) {
+                for (let i = 0; i < 3; i++) spawnPuff();
+            }
+
+            puffs.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                p.sz  *= p.grow;
+                p.life -= p.dec;
+                if (p.life > 0) {
+                    const [rr, gg, bb] = p.col;
+                    const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.sz);
+                    grd.addColorStop(0, `rgba(${rr},${gg},${bb},${p.life * 0.55})`);
+                    grd.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.sz, 0, Math.PI * 2);
+                    ctx.fillStyle = grd;
+                    ctx.fill();
+                }
+            });
+            puffs = puffs.filter(p => p.life > 0);
+
+            rafId = requestAnimationFrame(loop);
+        }
+
+        overlay.style.display = 'flex';
+        void overlay.offsetWidth;
+        overlay.classList.add('show');
+        rafId = requestAnimationFrame(loop);
+
+        setTimeout(() => { scene.classList.add('appear'); witch.classList.add('appear'); }, 150);
+        setTimeout(() => cauldronW.classList.add('lit'), 450);
+        setTimeout(() => brewText.classList.add('visible'), 700);
+
+        setTimeout(() => dropHerb(scene), 950);
+        setTimeout(() => dropHerb(scene), 1500);
+
+        setTimeout(() => vial.classList.add('appear'), 1750);
+        setTimeout(() => { vial.classList.add('pour'); stream.classList.add('flow'); }, 2050);
+
+        setTimeout(() => { cauldron.classList.add('boil-fast'); cauldronW.classList.add('boil-fast'); }, 2850);
+        setTimeout(() => cauldron.classList.add('flash'), 3100);
+
+        setTimeout(() => {
+            bursting = true;
+            fog1.classList.add('burst');
+            fog2.classList.add('burst');
+            fog3.classList.add('burst');
+        }, 3150);
+
+        setTimeout(() => flash.classList.add('flash'), 4300);
+
+        setTimeout(() => {
+            running = false;
+            cancelAnimationFrame(rafId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            showPage('oil', navBtn);
+            overlay.classList.remove('show');
+            scene.classList.remove('appear');
+            witch.classList.remove('appear');
+            vial.classList.remove('appear', 'pour');
+            stream.classList.remove('flow');
+            cauldronW.classList.remove('lit', 'boil-fast');
+            cauldron.classList.remove('boil-fast', 'flash');
+            brewText.classList.remove('visible');
+            fog1.classList.remove('burst');
+            fog2.classList.remove('burst');
+            fog3.classList.remove('burst');
+            flash.classList.remove('flash');
+            scene.querySelectorAll('.oil-herb').forEach(h => h.remove());
+            puffs = [];
+
+            setTimeout(() => { overlay.style.display = 'none'; }, 660);
+        }, 4600);
     }
 </script>
 </body>
